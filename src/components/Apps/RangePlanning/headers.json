@@ -225,6 +225,54 @@
         }
     },
     {
+        "headerName": "Minimum Stock",
+        "field": "minimum_Stock",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Maximum Stock",
+        "field": "maximum_Stock",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "(IN) Seasonal Minimum",
+        "field": "seasonal_Minimum",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "(IN) Seasonal Maximum",
+        "field": "seasonal_Maximum",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "(OUT) Seasonal Minimum",
+        "field": "seasonal_Minimum_Out",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "(OUT) Seasonal Maximum",
+        "field": "seasonal_Maximum_Out",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
         "headerName": "Item Volume Rank",
         "field": "item_volume_rank",
         "cellStyle": {
@@ -298,13 +346,16 @@
         }
     },
     {
-        "headerName": "Case Pack Qty",
-        "field": "case_Pack_Qty",
-        "hide": true
-    },
-    {
         "headerName": "DOS FAC",
         "field": "dos_fac",
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
+        "headerName": "Stock Units",
+        "field": "stock_Units",
+        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -326,64 +377,16 @@
         }
     },
     {
+        "headerName": "Average Stock Cost",
+        "field": "average_stock",
+        "hide": true,
+        "filterParams": {
+            "newRowsAction": "keep"
+        }
+    },
+    {
         "headerName": "Stock Cost",
         "field": "stock_Cost",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "Stock Units",
-        "field": "stock_Units",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "Minimum Stock",
-        "field": "minimum_Stock",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "Maximum Stock",
-        "field": "maximum_Stock",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "(IN) Seasonal Minimum",
-        "field": "seasonal_Minimum",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "(IN) Seasonal Maximum",
-        "field": "seasonal_Maximum",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "(OUT) Seasonal Minimum",
-        "field": "seasonal_Minimum_Out",
-        "hide": true,
-        "filterParams": {
-            "newRowsAction": "keep"
-        }
-    },
-    {
-        "headerName": "(OUT) Seasonal Maximum",
-        "field": "seasonal_Maximum_Out",
         "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
@@ -396,6 +399,12 @@
         "filterParams": {
             "newRowsAction": "keep"
         }
+    },
+    {
+        "headerName": "Case Pack Qty",
+        "field": "case_Pack_Qty",
+        "hide": true, 
+        "editable": true
     },
     {
         "headerName": "Case Pack Qty Exceeded",

@@ -18,7 +18,7 @@
                 <v-spacer></v-spacer>
             </v-toolbar>
             <v-card-text>
-                <div id="chartdiv"></div>
+                <div id="chartdivNew"></div>
             </v-card-text>
         </v-card>
         <Dialog ref="Dialog" />
@@ -56,7 +56,7 @@
 
         methods: {
             close() {
-                let chart = document.getElementById('chartdiv');
+                let chart = document.getElementById('chartdivNew');
 
                 // chart.clear();
                 chart = null;
@@ -111,7 +111,7 @@
             drawChart(data, key_value, testMode) {
                 let self = this;
 
-                let chart = am4core.create("chartdiv", am4charts.XYChart);
+                let chart = am4core.create("chartdivNew", am4charts.XYChart);
 
                 chart.events.on("hit", function (event) {
                     this.handleClick(data, event.target.series.values[1].tooltipDataItem.categoryX, event.target
@@ -124,9 +124,8 @@
 
                 chart.data = sortedData;
                 this.rowdata = sortedData
-                prepareParetoData();
 
-                function prepareParetoData() {
+                function prepareParetoData(callback) {
 
                     let total = 0;
 
@@ -142,105 +141,115 @@
                     let sum = 0;
                     for (var i = 0; i < chart.data.length; i++) {
                         let value = chart.data[i][key_value.value];
-                        chart.data[i].color = getColors(data[i][testMode ? 'test_Range_Indicator' : 'store_Range_Indicator'])
+                        chart.data[i].color = getColors(data[i][testMode ? 'test_Range_Indicator' :
+                            'store_Range_Indicator'
+                        ])
                         sum += value;
                         chart.data[i].pareto = sum / total * 100;
 
                     }
+
+                    setTimeout(() => {
+                        callback();
+                        console.log('starting callback');
+                    }, 300);
                 }
-                // Create axes
-                let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-                categoryAxis.dataFields.category = key_value.altValue;
-                categoryAxis.renderer.grid.template.location = 0;
-                categoryAxis.renderer.minGridDistance = 60;
-                categoryAxis.tooltip.disabled = true;
 
-                categoryAxis.title.text = "Units";
-                categoryAxis.title.rotation = 0;
-                categoryAxis.title.align = "center";
-                categoryAxis.title.valign = "top";
-                // categoryAxis.title.dy = -40;
-                categoryAxis.title.fontWeight = 600;
+                prepareParetoData(() => {
+                    // Create axes
+                    let categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+                    categoryAxis.dataFields.category = key_value.altValue;
+                    categoryAxis.renderer.grid.template.location = 0;
+                    categoryAxis.renderer.minGridDistance = 60;
+                    categoryAxis.tooltip.disabled = true;
 
-                // categoryAxis.renderer.labels._values.text = chart.data.altValue;
+                    categoryAxis.title.text = "Units";
+                    categoryAxis.title.rotation = 0;
+                    categoryAxis.title.align = "center";
+                    categoryAxis.title.valign = "top";
+                    // categoryAxis.title.dy = -40;
+                    categoryAxis.title.fontWeight = 600;
 
-                let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-                valueAxis.renderer.minWidth = 50;
-                valueAxis.min = 0;
-                valueAxis.cursorTooltipEnabled = false;
-                valueAxis.title.text = self.fact_name;
-                // valueAxis.title.rotation = 0;
-                // valueAxis.title.align = "center";
-                // valueAxis.title.valign = "top";
-                valueAxis.title.fontWeight = 600;
+                    // categoryAxis.renderer.labels._values.text = chart.data.altValue;
 
-                // Create series
-                let series = chart.series.push(new am4charts.ColumnSeries());
-                series.sequencedInterpolation = false;
-                series.dataFields.valueY = key_value.value;
-                series.dataFields.categoryX = key_value.altValue;
-                series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
-                series.columns.template.strokeWidth = 0;
+                    let valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                    valueAxis.renderer.minWidth = 50;
+                    valueAxis.min = 0;
+                    valueAxis.cursorTooltipEnabled = false;
+                    valueAxis.title.text = self.fact_name;
+                    // valueAxis.title.rotation = 0;
+                    // valueAxis.title.align = "center";
+                    // valueAxis.title.valign = "top";
+                    valueAxis.title.fontWeight = 600;
 
-
-
-                series.tooltip.pointerOrientation = "vertical";
-
-                series.columns.template.column.cornerRadiusTopLeft = 10;
-                series.columns.template.column.cornerRadiusTopRight = 10;
-                series.columns.template.column.fillOpacity = 0.8;
-
-                // on hover, make corner radiuses bigger
-                let hoverState = series.columns.template.column.states.create("hover");
-                hoverState.properties.cornerRadiusTopLeft = 0;
-                hoverState.properties.cornerRadiusTopRight = 0;
-                hoverState.properties.fillOpacity = 1;
-
-                // series.columns.template.adapter.add("fill", function (fill, target) {
-                //     return chart.colors.getIndex(target.dataItem.index);
-                // })
+                    // Create series
+                    let series = chart.series.push(new am4charts.ColumnSeries());
+                    series.sequencedInterpolation = false;
+                    series.dataFields.valueY = key_value.value;
+                    series.dataFields.categoryX = key_value.altValue;
+                    series.tooltipText = "[{categoryX}: bold]{valueY}[/]";
+                    series.columns.template.strokeWidth = 0;
 
 
-                let paretoValueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-                paretoValueAxis.renderer.opposite = true;
-                paretoValueAxis.min = 0;
-                paretoValueAxis.max = 100;
-                paretoValueAxis.strictMinMax = true;
-                paretoValueAxis.renderer.grid.template.disabled = true;
-                paretoValueAxis.numberFormatter = new am4core.NumberFormatter();
-                paretoValueAxis.numberFormatter.numberFormat = "#'%'"
-                paretoValueAxis.cursorTooltipEnabled = false;
 
-                let paretoSeries = chart.series.push(new am4charts.LineSeries())
-                paretoSeries.dataFields.valueY = "pareto";
-                paretoSeries.dataFields.color = "color";
-                paretoSeries.dataFields.categoryX = key_value.altValue;
-                paretoSeries.dataFields.categoryz = key_value.key;
-                paretoSeries.dataFields.categoryzz = key_value.percent;
-                
-                
-                paretoSeries.yAxis = paretoValueAxis;
-                paretoSeries.tooltipText =
-                    `{categoryzz}% of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
+                    series.tooltip.pointerOrientation = "vertical";
 
-                let circleBullet = paretoSeries.bullets.push(new am4charts.CircleBullet());
-                circleBullet.circle.propertyFields.fill = "color";
-                circleBullet.circle.strokeWidth = 2;
+                    series.columns.template.column.cornerRadiusTopLeft = 10;
+                    series.columns.template.column.cornerRadiusTopRight = 10;
+                    series.columns.template.column.fillOpacity = 0.8;
+
+                    // on hover, make corner radiuses bigger
+                    let hoverState = series.columns.template.column.states.create("hover");
+                    hoverState.properties.cornerRadiusTopLeft = 0;
+                    hoverState.properties.cornerRadiusTopRight = 0;
+                    hoverState.properties.fillOpacity = 1;
+
+                    // series.columns.template.adapter.add("fill", function (fill, target) {
+                    //     return chart.colors.getIndex(target.dataItem.index);
+                    // })
 
 
-                // let bullet = paretoSeries.bullets.push(new am4charts.Bullet());
-                // bullet.circle.stroke = am4core.color("#fff");
-                // bullet.circle.strokeWidth = 2;
-                // paretoSeries.bullets.push(new am4charts.CircleBullet());
-                // paretoSeries.bullets.fill = am4core.color("#fff");
-                paretoSeries.strokeWidth = 2;
-                paretoSeries.stroke = new am4core.InterfaceColorSet().getFor("alternativeBackground");
-                paretoSeries.strokeOpacity = 0.5;
+                    let paretoValueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+                    paretoValueAxis.renderer.opposite = true;
+                    paretoValueAxis.min = 0;
+                    paretoValueAxis.max = 100;
+                    paretoValueAxis.strictMinMax = true;
+                    paretoValueAxis.renderer.grid.template.disabled = true;
+                    paretoValueAxis.numberFormatter = new am4core.NumberFormatter();
+                    paretoValueAxis.numberFormatter.numberFormat = "#'%'"
+                    paretoValueAxis.cursorTooltipEnabled = false;
 
-                // Cursor
-                chart.cursor = new am4charts.XYCursor();
-                chart.cursor.behavior = "panX";
-                this.chart = chart
+                    let paretoSeries = chart.series.push(new am4charts.LineSeries())
+                    paretoSeries.dataFields.valueY = "pareto";
+                    paretoSeries.dataFields.color = "color";
+                    paretoSeries.dataFields.categoryX = key_value.altValue;
+                    paretoSeries.dataFields.categoryz = key_value.key;
+                    paretoSeries.dataFields.categoryzz = key_value.percent;
+
+
+                    paretoSeries.yAxis = paretoValueAxis;
+                    paretoSeries.tooltipText =
+                        `{categoryzz}% of the items = {valueY.formatNumber('#.0')}%[/] of ${self.fact_name}`;
+
+                    let circleBullet = paretoSeries.bullets.push(new am4charts.CircleBullet());
+                    circleBullet.circle.propertyFields.fill = "color";
+                    circleBullet.circle.strokeWidth = 2;
+
+
+                    // let bullet = paretoSeries.bullets.push(new am4charts.Bullet());
+                    // bullet.circle.stroke = am4core.color("#fff");
+                    // bullet.circle.strokeWidth = 2;
+                    // paretoSeries.bullets.push(new am4charts.CircleBullet());
+                    // paretoSeries.bullets.fill = am4core.color("#fff");
+                    paretoSeries.strokeWidth = 2;
+                    paretoSeries.stroke = new am4core.InterfaceColorSet().getFor("alternativeBackground");
+                    paretoSeries.strokeOpacity = 0.5;
+
+                    // Cursor
+                    chart.cursor = new am4charts.XYCursor();
+                    chart.cursor.behavior = "panX";
+                    this.chart = chart
+                });
             }
         }
 
@@ -261,7 +270,7 @@
 </script>
 
 <style scoped>
-    #chartdiv {
+    #chartdivNew {
         height: 600px;
     }
 </style>

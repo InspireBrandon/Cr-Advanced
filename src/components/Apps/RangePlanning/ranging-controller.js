@@ -36,7 +36,16 @@ class RangingController {
     self.tag = rangingData.tag;
     self.totalsData = null;
     self.endingStock = null;
+    self.averageStock = null;
     self.categoryCharacteristics = rangingData.categoryCharacteristics;
+
+    self.allRangeProducts.forEach(rp => {
+      let parsedCPQ = parseInt(rp.case_Pack_Qty);
+
+      if(parsedCPQ == undefined || parsedCPQ == null || isNaN(parsedCPQ) || parsedCPQ < 1) {
+        rp.case_Pack_Qty = 1;
+      }
+    })
 
     // SET TEST INDICATORS
     self.storeSales.forEach(store => {
@@ -57,6 +66,10 @@ class RangingController {
   getClusterData() {
     let self = this;
     return self.clusterData;
+  }
+
+  getSeasonalData() {
+    return seasonalData;
   }
 
   getSalesMonthlyTotals(planogramID, type, callback) {
@@ -82,7 +95,22 @@ class RangingController {
     Axios.get(process.env.VUE_APP_API + `Ranging/ClosingStock?planogramID=${self.planogramID}&periodID=${self.dateTo}&type=${type}`)
       .then(r => {
         self.endingStock = r.data;
-        callback(r.data);
+        self.getAverageStock(type, () => {
+          callback();
+        })
+      })
+      .catch(e => {
+
+      })
+  }
+
+  getAverageStock(type, callback) {
+    let self = this;
+
+    Axios.get(process.env.VUE_APP_API + `Ranging/AverageStock?planogramID=${self.planogramID}&periodFromID=${self.dateFrom}&periodToID=${self.dateTo}&type=${type}`)
+      .then(r => {
+        self.averageStock = r.data;
+        callback();
       })
       .catch(e => {
 
@@ -103,6 +131,29 @@ class RangingController {
       let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
 
       self.endingStock.forEach(es => {
+        if (storeInCluster(es.store_ID, stores)) {
+          retval.push(es)
+        }
+      })
+    }
+
+    return retval;
+  }
+
+  getAverageStockData(clusterType, clusterID) {
+    let self = this;
+    let retval = [];
+
+    if (clusterType == "stores") {
+      self.averageStock.forEach(es => {
+        if (es.store_ID == clusterID) {
+          retval.push(es)
+        }
+      })
+    } else {
+      let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
+
+      self.averageStock.forEach(es => {
         if (storeInCluster(es.store_ID, stores)) {
           retval.push(es)
         }
@@ -504,14 +555,14 @@ class RangingController {
 
   getSalesDataByStore(storeID, autoRangeData) {
     let store = getStoreByID(storeID, this.storeSales);
-    let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales, this.totalsData, autoRangeData, this.endingStock);
+    let sales = getSalesDataByStore(store, this.allRangeProducts, this.storeSales, this.totalsData, autoRangeData, this.endingStock, this.averageStock);
     return sales;
   }
 
   getSalesDataByCluster(clusterType, clusterID, autoRangeData) {
     let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
 
-    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID, this.totalsData, autoRangeData, this.endingStock);
+    let sales = getSalesDataByStores(stores, this.allRangeProducts, this.storeSales, this.clusterData, clusterType, clusterID, this.totalsData, autoRangeData, this.endingStock, this.averageStock);
     return sales;
   }
 
@@ -615,6 +666,18 @@ class RangingController {
     })
 
     // setDefaultValuesIfNull();
+  }
+
+  getOosDaysStore(productID, storeID) {
+    return getOosDaysStore(this.storeSales, productID, storeID);
+  }
+
+  calculateConstraints(min, max, autoRangeData, average_price, isNewItem) {
+    return calculateConstraints(min, max, autoRangeData, average_price, isNewItem);
+  }
+
+  getStockUnitsStore(productID, storeID) {
+    return getStockUnitsStore(this.endingStock, productID, storeID);
   }
 }
 
@@ -976,6 +1039,22 @@ function getStockUnits(stockData, productID, clusters, clusterType, clusterID) {
   return stockunits;
 }
 
+function getAverageStock(stockData, productID, clusters, clusterType, clusterID) {
+  let clusterStores = getStoresByCluster(clusters, clusterType, clusterID);
+
+  let stockunits = 0;
+
+  stockData.forEach(stockData => {
+    if (IsClusterStore(clusterStores, stockData.store_ID)) {
+      if (stockData.product_ID == productID) {
+        stockunits += stockData.closingCost;
+      }
+    }
+  })
+
+  return stockunits;
+}
+
 function getStockUnitsStore(stockData, productID, storeID) {
   let stockUnits = 0;
 
@@ -983,6 +1062,20 @@ function getStockUnitsStore(stockData, productID, storeID) {
     if (stockData.store_ID == storeID) {
       if (stockData.product_ID == productID) {
         stockUnits += stockData.closingUnits;
+      }
+    }
+  })
+
+  return stockUnits;
+}
+
+function getAverageStockStore(stockData, productID, storeID) {
+  let stockUnits = 0;
+
+  stockData.forEach(stockData => {
+    if (stockData.store_ID == storeID) {
+      if (stockData.product_ID == productID) {
+        stockUnits += stockData.closingCost;
       }
     }
   })
@@ -1313,7 +1406,7 @@ function GetRanks(storeSales, clusters, clusterType, clusterID) {
   return retArr
 }
 
-function getSalesDataByStore(store, allProducts, storeSales, totalsData, autoRangeData, endingStock) {
+function getSalesDataByStore(store, allProducts, storeSales, totalsData, autoRangeData, endingStock, averageStock) {
   let sales = [];
 
   let salesArr = getStoreSalesByStoreID(storeSales, store.storeID);
@@ -1323,12 +1416,12 @@ function getSalesDataByStore(store, allProducts, storeSales, totalsData, autoRan
     sales.push(salesItem);
   }
 
-  let totalSales = getTotalStoreProductSales(allProducts, sales, storeSales, [store], store.storeID, totalsData, autoRangeData, endingStock);
+  let totalSales = getTotalStoreProductSales(allProducts, sales, storeSales, [store], store.storeID, totalsData, autoRangeData, endingStock, averageStock);
   return totalSales;
 }
 
 // Get all the sum of sales data by stores
-function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID, totalsData, autoRangeData, endingStock) {
+function getSalesDataByStores(stores, allProducts, storeSales, clusters, clusterType, clusterID, totalsData, autoRangeData, endingStock, averageStock) {
   let sales = [];
 
   for (let i = 0; i < stores.length; i++) {
@@ -1341,7 +1434,7 @@ function getSalesDataByStores(stores, allProducts, storeSales, clusters, cluster
     }
   }
 
-  let totalSales = getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData, autoRangeData, endingStock);
+  let totalSales = getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData, autoRangeData, endingStock, averageStock);
   return totalSales;
 }
 
@@ -1358,7 +1451,7 @@ function getStoreSalesByStoreID(storeSales, storeID) {
   return sales;
 }
 
-function getTotalStoreProductSales(allProducts, sales, storeSales, stores, storeID, totalsData, autoRangeData, endingStock) {
+function getTotalStoreProductSales(allProducts, sales, storeSales, stores, storeID, totalsData, autoRangeData, endingStock, averageStock) {
   let productSales = [];
 
   let totalSales = 0;
@@ -1392,10 +1485,25 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       }
     };
 
+    let calculated_oos_days = getOosDaysStore(storeSales, product.productID, storeID);
+    let lost_units = (parseFloat(sales_units * 6).toFixed(1) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
+    let volume_adjusted = sales_units + lost_units;
+
+    let use_adjuested = (autoRangeData == undefined || autoRangeData == null || autoRangeData.use_volume_adjusted == undefined || autoRangeData.use_volume_adjusted == null) ? false : autoRangeData.use_volume_adjusted;
+    let volumeToUse = use_adjuested ? volume_adjusted : sales_units;
+
+    let lost_sales = (parseFloat(sales_retail * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
+    let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
+
+    let salesToUse = autoRangeData.use_volume_adjusted ? (lost_sales + sales_retail) : sales_retail;
+    let costToUse = autoRangeData.use_volume_adjusted ? (lost_cost + sales_cost) : sales_cost;
+    
+    let sales_profit = salesToUse - costToUse;
+    let lost_profit = (parseFloat(sales_profit * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
+
     // complex calculations;
-    let sales_profit = sales_retail - sales_cost;
-    let selling_price = sales_retail / sales_units;
-    let cost_price = (sales_retail - sales_profit) / sales_units;
+    let selling_price = salesToUse / volume_adjusted;
+    let cost_price = (salesToUse - sales_profit) / volume_adjusted;
 
     let number_distribution = 100;
     let weighted_distribution = 100;
@@ -1406,25 +1514,20 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
 
     let new_Stock_Cost = getStockCostStore(endingStock, product.productID, storeID);
     let new_Stock_Units = getStockUnitsStore(endingStock, product.productID, storeID);
+    let average_Stock = getAverageStockStore(averageStock, product.productID, storeID);
 
-    let calculated_oos_days = getOosDaysStore(storeSales, product.productID, storeID);
     let oos_days = calculated_oos_days / 6;
 
-    let average_cost = isNaN(sales_cost / sales_units) ? 0 : sales_cost / sales_units;
-    let average_price = isNaN(sales_retail / sales_units) ? 0 : sales_retail / sales_units;
+    let average_cost = isNaN(costToUse / volume_adjusted) ? 0 : costToUse / volume_adjusted;
+    let average_price = isNaN(salesToUse / volume_adjusted) ? 0 : salesToUse / volume_adjusted;
 
-    let days_of_supply = isNaN(new_Stock_Units / sales_units * 30) ? 0 : new_Stock_Units / sales_units * 30;
-    let stock_turn = isNaN((sales_cost * 12) / new_Stock_Cost) ? 0 : (sales_cost * 12) / new_Stock_Cost;
-
-    let lost_sales = (parseFloat(sales_retail * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
-    let lost_units = (parseFloat(sales_units * 6).toFixed(1) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
-    let lost_profit = (parseFloat(sales_profit * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
-    let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
+    let days_of_supply = isNaN(new_Stock_Units / volumeToUse * 30) ? 0 : new_Stock_Units / volumeToUse * 30;
+    let stock_turn = isNaN((sales_cost * 12) / average_Stock) ? 0 : (sales_cost * 12) / average_Stock;
 
     let gross_profit = ((selling_price - cost_price) / selling_price) * 100;
     let markup = ((selling_price - cost_price) / cost_price) * 100;
 
-    let oneWeekStock = sales_units / 4;
+    let oneWeekStock = volumeToUse / 4;
 
     let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
     let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
@@ -1448,13 +1551,6 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let _minMax = calculateConstraints(Math.round(minimum_Stock), Math.round(maximum_Stock), autoRangeData, average_price, isNewItem);
     let _minMaxIn = calculateConstraints(Math.round(seasonal_Minimum), Math.round(seasonal_Maximum), autoRangeData, average_price, isNewItem);
     let _minMaxOut = calculateConstraints(Math.round(seasonal_Minimum_Out), Math.round(seasonal_Maximum_Out), autoRangeData, average_price, isNewItem);
-
-    if (product.barcode == '6001385000092') {
-      console.log("_minMax", _minMax)
-      console.log("_minMaxIn", _minMaxIn)
-      console.log("_minMaxOut", _minMaxOut)
-      console.log("min max", seasonal_Minimum_Out, seasonal_Maximum_Out)
-    }
 
     let case_Pack_Qty_Exceeded = 0;
 
@@ -1508,9 +1604,9 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let dos_fac = getDaysOfSupplyFacingsStore(storeID, sales_units, product.depth, autoRangeData);
 
     productSales.push(new RangeProduct(product, {
-      sales_retail: parseFloat((sales_retail).toFixed(0)),
-      sales_cost: parseFloat((sales_cost).toFixed(0)),
-      sales_units: parseFloat((sales_units).toFixed(1)),
+      sales_retail: parseFloat((salesToUse).toFixed(0)),
+      sales_cost: parseFloat((costToUse).toFixed(0)),
+      sales_units: parseFloat((volumeToUse).toFixed(1)),
       sales_profit: parseFloat((sales_profit).toFixed(0)),
       stock_units: parseFloat(new_Stock_Units.toFixed(0)),
       stock_cost: parseFloat(new_Stock_Cost.toFixed(0)),
@@ -1519,8 +1615,9 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       lost_units: parseFloat(lost_units.toFixed(1)),
       lost_profit: parseFloat(lost_profit.toFixed(0)),
       lost_cost: parseFloat(lost_cost.toFixed(0)),
-      average_cost: parseFloat(average_cost.toFixed(0)),
-      average_price: parseFloat(average_price.toFixed(0)),
+      average_cost: parseFloat(average_cost.toFixed(2)),
+      average_price: parseFloat(average_price.toFixed(2)),
+      average_stock: parseFloat(average_Stock.toFixed(0)),
       days_of_supply: parseFloat(days_of_supply.toFixed(0)),
       stock_turn: parseFloat(stock_turn.toFixed(0)),
       number_distribution: number_distribution.toFixed(0),
@@ -1581,7 +1678,7 @@ function storeInCluster(storeID, clusterStores) {
 }
 
 // Get total product sales
-function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData, autoRangeData, endingStock) {
+function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, clusterType, clusterID, totalsData, autoRangeData, endingStock, averageStock) {
   let productSales = [];
 
   let totalSales = 0;
@@ -1613,10 +1710,26 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       }
     };
 
+
+    let calculated_oos_days = getOosDays(storeSales, product.productID, clusters, clusterType, clusterID);
+    let lost_units = (parseFloat(sales_units * 6).toFixed(1) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
+    let volume_adjusted = sales_units + lost_units;
+
+    let use_adjuested = (autoRangeData == undefined || autoRangeData == null || autoRangeData.use_volume_adjusted == undefined || autoRangeData.use_volume_adjusted == null) ? false : autoRangeData.use_volume_adjusted;
+    let volumeToUse = use_adjuested ? volume_adjusted : sales_units;
+
+    let lost_sales = (parseFloat(sales_retail * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
+    let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days  / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
+
+    let salesToUse = autoRangeData.use_volume_adjusted ? (lost_sales + sales_retail) : sales_retail;
+    let costToUse = autoRangeData.use_volume_adjusted ? (lost_cost + sales_cost) : sales_cost;
+
+    let sales_profit = salesToUse - costToUse;
+    let lost_profit = (parseFloat(sales_profit * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6 / clusterStores.length;
+
     // complex calculations;
-    let sales_profit = sales_retail - sales_cost;
-    let selling_price = sales_retail / sales_units;
-    let cost_price = (sales_retail - sales_profit) / sales_units;
+    let selling_price = salesToUse / volumeToUse;
+    let cost_price = (salesToUse - sales_profit) / volumeToUse;
 
     let gross_profit = ((selling_price - cost_price) / selling_price) * 100;
     let markup = ((selling_price - cost_price) / cost_price) * 100;
@@ -1627,28 +1740,22 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let units_contribution = getUnitsContribution(storeSales, product.productID, clusters, clusterType, clusterID, totalsData);
     let profit_contribution = getProfitContribution(storeSales, product.productID, clusters, clusterType, clusterID, totalsData);
 
-    let new_Stock_Cost = getStockCost(endingStock, product.productID, clusters, clusterType, clusterID);
-    let new_Stock_Units = getStockUnits(endingStock, product.productID, clusters, clusterType, clusterID);
+    let new_Stock_Cost = getStockCost(averageStock, product.productID, clusters, clusterType, clusterID);
+    let new_Stock_Units = getStockUnits(averageStock, product.productID, clusters, clusterType, clusterID);
+    let average_Stock = getAverageStock(averageStock, product.productID, clusters, clusterType, clusterID);
 
-    let calculated_oos_days = getOosDays(storeSales, product.productID, clusters, clusterType, clusterID);
     let oos_days = calculated_oos_days.oos_days / calculated_oos_days.stores / 6;
 
-    let average_cost = isNaN(sales_cost / sales_units) ? 0 : sales_cost / sales_units;
-    let average_price = isNaN(sales_retail / sales_units) ? 0 : sales_retail / sales_units;
+    let average_cost = isNaN(costToUse / volumeToUse) ? 0 : costToUse / volumeToUse;
+    let average_price = isNaN(salesToUse / volumeToUse) ? 0 : salesToUse / volumeToUse;
 
-    let days_of_supply = isNaN(new_Stock_Units / sales_units * 30) ? 0 : new_Stock_Units / sales_units * 30;
-    let stock_turn = isNaN((sales_cost * 12) / new_Stock_Cost) ? 0 : (sales_cost * 12) / new_Stock_Cost;
+    let days_of_supply = isNaN(new_Stock_Units / volumeToUse * 30) ? 0 : new_Stock_Units / volumeToUse * 30;
+    let stock_turn = isNaN((sales_cost * 12) / average_Stock) ? 0 : (sales_cost * 12) / average_Stock;
 
     let totalDays = 30 * 6 * clusterStores.length;
     let numberOfStores = clusterStores.length;
 
-    // let lost_sales = calculateLostSales(storeSales, product.productID, clusters, clusterType, clusterID); (sales_retail / (totalDays - calculated_oos_days.oos_days) / numberOfStores / 6);
-    let lost_sales = (sales_retail * 6 / (totalDays - calculated_oos_days.oos_days) * calculated_oos_days.oos_days / 6);
-    let lost_units = (sales_units * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6;
-    let lost_profit = (sales_profit * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6
-    let lost_cost = (sales_cost * 6 / (totalDays - calculated_oos_days.oos_days)) * calculated_oos_days.oos_days / 6;
-
-    let oneWeekStock = sales_units / 4;
+    let oneWeekStock = volumeToUse / 4;
 
     let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
     let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
@@ -1716,8 +1823,8 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       }
     })
 
-    if (weighted_distribution != 0 && sales_retail != 0)
-      (sales_potential = sales_retail / weighted_distribution * 100).toFixed(0);
+    if (weighted_distribution != 0 && salesToUse != 0)
+      (sales_potential = salesToUse / weighted_distribution * 100).toFixed(0);
 
     if (weighted_distribution != 0 && sales_units != 0)
       (volume_potential = sales_units / weighted_distribution * 100).toFixed(0);
@@ -1726,15 +1833,15 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       (profit_potential = sales_profit / weighted_distribution * 100).toFixed(0);
 
     if (weighted_distribution != 0 && sales_units != 0)
-      (cost_potential = sales_cost / weighted_distribution * 100).toFixed(0);
+      (cost_potential = costToUse / weighted_distribution * 100).toFixed(0);
 
     // dos_fac = getDaysOfSupplyFacings(clusters, clusterType, clusterID, volume_potential, product.depth)
     let dos_fac = (autoRangeData == undefined || autoRangeData == null) ? 0 : getDaysOfSupplyPerX(autoRangeData.dos_units, clusters, clusterType, clusterID, volume_potential, autoRangeData)
 
     productSales.push(new RangeProduct(product, {
-      sales_retail: parseFloat((sales_retail).toFixed(0)),
-      sales_cost: parseFloat((sales_cost).toFixed(0)),
-      sales_units: parseFloat((sales_units).toFixed(1)),
+      sales_retail: parseFloat((salesToUse).toFixed(0)),
+      sales_cost: parseFloat((costToUse).toFixed(0)),
+      sales_units: parseFloat((volumeToUse).toFixed(1)),
       sales_profit: parseFloat((sales_profit).toFixed(0)),
       stock_units: parseFloat(new_Stock_Units.toFixed(0)),
       stock_cost: parseFloat(new_Stock_Cost.toFixed(0)),
@@ -1745,8 +1852,9 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       lost_cost: parseFloat(lost_cost.toFixed(0)),
       average_cost: parseFloat(average_cost.toFixed(0)),
       average_price: parseFloat(average_price.toFixed(0)),
+      average_stock: parseFloat(average_Stock.toFixed(0)),
       days_of_supply: parseFloat(days_of_supply.toFixed(0)),
-      stock_turn: parseFloat(stock_turn.toFixed(2)),
+      stock_turn: parseFloat(stock_turn.toFixed(0)),
       number_distribution: number_distribution.toFixed(0),
       weighted_distribution: weighted_distribution.toFixed(0),
       sales_potential: parseFloat(sales_potential.toFixed(0)),
@@ -1813,8 +1921,8 @@ function calculateConstraints(min, max, autoRangeData, average_price, isNewItem)
     retval.minUpdated = retval.min < autoRangeData.default_minimum ? true : false;
     retval.min = retval.min < autoRangeData.default_minimum ? autoRangeData.default_minimum : retval.min;
 
-    retval.maxUpdated = retval.max < autoRangeData.default_minimum_max ? true : false;
-    retval.max = retval.max < autoRangeData.default_minimum_max ? autoRangeData.default_minimum_max : retval.max;
+    retval.maxUpdated = retval.max != autoRangeData.default_minimum_max ? true : false;
+    retval.max = retval.max != autoRangeData.default_minimum_max ? autoRangeData.default_minimum_max : retval.max;
 
     if (average_price < autoRangeData.default_price_minimum) {
       retval.minUpdated = retval.min >= autoRangeData.default_price_minimum_min ? false : true;
@@ -2014,6 +2122,7 @@ function RangeProduct(productData, salesData, indicator, testIndicator) {
   self.lost_Cost = salesData.lost_cost;
   self.average_cost = salesData.average_cost;
   self.average_price = salesData.average_price;
+  self.average_stock = salesData.average_stock;
   self.days_of_supply = salesData.days_of_supply;
   self.stock_turn = salesData.stock_turn;
   self.number_Distribution = salesData.number_distribution + " %";

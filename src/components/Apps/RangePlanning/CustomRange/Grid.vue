@@ -4,7 +4,7 @@
             class="ag-theme-balham" :columnDefs="columnDefs" :rowData="rowData" :enableSorting="true"
             :enableFilter="true" :suppressRowClickSelection="true" :enableRangeSelection="true" rowSelection="multiple"
             :rowDeselection="true" :enableColResize="true" :floatingFilter="true" :onGridReady="onGridReady"
-            :groupMultiAutoColumn="true" :cellEditingStarted="onRowEditingStarted">
+            :groupMultiAutoColumn="true">
         </ag-grid-vue>
     </div>
 </template>

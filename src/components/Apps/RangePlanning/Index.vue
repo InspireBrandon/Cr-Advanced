@@ -107,8 +107,11 @@
             <v-list-tile @click="exportData('Csv')">
               <v-list-tile-title>CSV</v-list-tile-title>
             </v-list-tile>
-            <v-list-tile @click="exportStockOrder">
-              <v-list-tile-title>Product Supply</v-list-tile-title>
+            <v-list-tile @click="generateStockMovementExport(true)">
+              <v-list-tile-title>Product Supply Indicators</v-list-tile-title>
+            </v-list-tile>
+            <v-list-tile @click="generateStockMovementExport(false)">
+              <v-list-tile-title>Product Supply Sales</v-list-tile-title>
             </v-list-tile>
           </v-list>
         </v-menu>
@@ -309,6 +312,7 @@
     <ViewSetup ref="ViewSetup" />
     <IndicatorSetup ref="IndicatorSetup" />
     <SeasonalityGraph ref="SeasonalityGraph" />
+    <MinMaxToggle ref="MinMaxToggle" />
   </div>
 </template>
 
@@ -357,6 +361,8 @@
   import ViewSetup from "./ViewSetup.vue";
   import IndicatorSetup from './IndicatorSetup.vue'
   import SeasonalityGraph from './SeasonalityGraph.vue'
+  import MinMaxToggle from './MinMaxToggle.vue';
+
   // import XLSX from 'xlsx';
 
   import RetailChainSelector from "@/components/Common/RetailChainSelector";
@@ -413,7 +419,8 @@
       RetailChainSelector,
       ViewSetup,
       IndicatorSetup,
-      SeasonalityGraph
+      SeasonalityGraph,
+      MinMaxToggle
     },
     data() {
       return {
@@ -433,6 +440,7 @@
         columnDefs: [],
         rowData: [],
         gridOptions: {
+          rowHeight: 35,
           enableCharts: true,
           enableRangeSelection: true,
           context: {
@@ -459,6 +467,8 @@
           dos_units: 6,
           inclusive_units: 6,
           minimum_units: 1,
+          use_volume_adjusted: true,
+          delisted_to_packinglist: false,
           // Product Supply
           safety_stock_highlight: 1,
           casepack_qty: 12,
@@ -610,6 +620,107 @@
       self.getStores();
     },
     methods: {
+      generateStockMovementExport(useIndicator) {
+        let self = this;
+        let seasonalData = self.rangingController.getSeasonalData();
+        let request = [];
+
+        self.$refs.spinner.show();
+
+        self.rangingController.storeSales.forEach(store => {
+          let sales = store.salesData;
+
+          sales.forEach(sale => {
+            let sales_Units = parseFloat(sale.sales_Units);
+            let calculated_oos_days = self.rangingController.getOosDaysStore(sale.productID, store.storeID);
+            let lost_units = (parseFloat(sales_Units * 6).toFixed(1) / ((30 * 6) - calculated_oos_days) *
+              calculated_oos_days) / 6;
+            let volume_adjusted = parseFloat(sales_Units) + lost_units;
+            let volumeToUse = self.autoRangeData.use_volume_adjusted ? volume_adjusted : sales_units;
+            let oneWeekStock = volumeToUse / 4;
+            let new_Stock_Units = self.rangingController.getStockUnitsStore(sale.productID, store.storeID);
+
+            let minimum_Stock = oneWeekStock * self.autoRangeData.minumum_stock;
+            let maximum_Stock = oneWeekStock * self.autoRangeData.maximum_stock;
+
+            let outSeasonRatio = ((seasonalData.rangeVolume - seasonalData.averageLow) / seasonalData
+              .rangeVolume);
+
+            let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * self.autoRangeData.minumum_stock;
+            let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * self.autoRangeData.maximum_stock;
+
+            let average_price = isNaN(sale.sales_Retail / volumeToUse) ? 0 : sale.sales_retail / volumeToUse;
+
+            let minMax = self.rangingController.calculateConstraints(Math.round(minimum_Stock), Math.round(maximum_Stock), self.autoRangeData, average_price, true);
+
+            let minMaxOut = self.rangingController.calculateConstraints(Math.round(seasonal_Minimum_Out), Math.round(seasonal_Maximum_Out), self.autoRangeData, average_price, true);
+
+            let surplusRequired = oneWeekStock * parseFloat(self.autoRangeData.surplus_stock);
+            let surplus_Stock = new_Stock_Units - surplusRequired;
+
+            let item = {
+              store_ID: store.storeID,
+              planogram_ID: sale.planogram_ID,
+              category_ID: self.getCategoryByProductID(sale.productID),
+              product_ID: sale.productID,
+              min: minMax.min,
+              max: minMax.max,
+              seasonal_Min: minMaxOut.min,
+              seasonal_Max: minMaxOut.max,
+              current_Overstock: surplus_Stock,
+              current_Overstock_Display: surplus_Stock,
+              stock_Attainable: surplusRequired - new_Stock_Units,
+              stock_Attainable_Display: surplusRequired - new_Stock_Units,
+              ls: "ND"
+            }
+
+            if (useIndicator) {
+              if (sale.store_Range_Indicator == "YES") {
+                if (item.min == 2) {
+                  item.ls = "EX";
+                }
+
+                if (item.min >= 3) {
+                  item.ls = "HB";
+                }
+              }
+            } else {
+              if (sale.sales_Retail > 0) {
+                if (item.min == 2) {
+                  item.ls = "EX";
+                }
+
+                if (item.min >= 3) {
+                  item.ls = "HB";
+                }
+              }
+            }
+
+            request.push(item);
+          });
+        });
+
+        Axios.post(process.env.VUE_APP_API + 'StockMovement', request)
+          .then(r => {
+            self.$refs.spinner.hide();
+          })
+          .catch(e => {
+            self.$refs.spinner.hide();
+          })
+      },
+      getCategoryByProductID(productID) {
+        let self = this;
+
+        let retval;
+
+        self.rangingController.allRangeProducts.forEach(el => {
+          if (el.productID == productID) {
+            retval = el.categoryLink_ID;
+          }
+        })
+
+        return retval;
+      },
       toggleConstraints() {
         let self = this;
 
@@ -792,6 +903,10 @@
             .stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all || includeStockLevels;
         }
         break;
+        case 'volume_adjusted': {
+          retval = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+        }
+        break;
         case 'item_volume_rank': {
           retval = options.volumeAnalysis == headerOptions.all;
         }
@@ -854,12 +969,16 @@
           retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.all;
         }
         break;
-        case 'stock_Turns': {
+        case 'stock_turn': {
+          retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+        }
+        break;
+        case 'average_stock': {
           retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.all;;
         }
         break;
         case 'stock_Cost': {
-          retval = options.stockAnalysis == headerOptions.all || options.stockLevels == headerOptions.all;;
+          retval = options.stockAnalysis == headerOptions.all;
         }
         break;
         case 'stock_Units': {
@@ -892,11 +1011,11 @@
         }
         break;
         case 'surplus_Stock': {
-          retval = options.stockLevels == headerOptions.all;
+          retval = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
         }
         break;
         case 'case_Pack_Qty_Exceeded': {
-          retval = options.stockLevels == headerOptions.all;
+          retval = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
         }
         break;
         case 'lost_Sales': {
@@ -994,7 +1113,7 @@
         }
         break;
         case 'average_price': {
-          let includeStockLevels = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
+          let includeStockLevels = options.stockLevels == headerOptions.all;
 
           retval = options.priceAndMargin == headerOptions.yes || options.priceAndMargin == headerOptions.all ||
             includeStockLevels;
@@ -2345,7 +2464,7 @@
         let self = this;
 
         // MAIN
-        self.columnDefs[38] = {
+        self.columnDefs[24] = {
           headerName: "Minimum Stock",
           field: "minimum_Stock",
           hide: true,
@@ -2367,10 +2486,11 @@
                 }
               }
             }
-          }
+          },
+          cellRendererFramework: "MinMaxToggle",
         }
 
-        self.columnDefs[39] = {
+        self.columnDefs[25] = {
           headerName: "Maximum Stock",
           field: "maximum_Stock",
           hide: true,
@@ -2396,7 +2516,7 @@
         }
 
         // SEASONAL IN
-        self.columnDefs[40] = {
+        self.columnDefs[26] = {
           headerName: "(IN) Seasonal Minimum",
           field: "seasonal_Minimum",
           hide: true,
@@ -2421,7 +2541,7 @@
           }
         }
 
-        self.columnDefs[41] = {
+        self.columnDefs[27] = {
           headerName: "(IN) Seasonal Maximum",
           field: "seasonal_Maximum",
           hide: true,
@@ -2447,7 +2567,7 @@
         }
 
         // SEASONAL OUT
-        self.columnDefs[42] = {
+        self.columnDefs[28] = {
           headerName: "(OUT) Seasonal Minimum",
           field: "seasonal_Minimum_Out",
           hide: true,
@@ -2472,7 +2592,7 @@
           }
         }
 
-        self.columnDefs[43] = {
+        self.columnDefs[29] = {
           headerName: "(OUT) Seasonal Maximum",
           field: "seasonal_Maximum_Out",
           hide: true,
@@ -2584,39 +2704,6 @@
               }
             };
 
-            // self.columnDefs[32] = {
-            //   headerName: "Case Pack Qty",
-            //   field: "case_Pack_Qty",
-            //   hide: true,
-            //   cellStyle: function (params) {
-            //     let checkValue = (parseFloat(params.data.case_Pack_Qty) > 0 ? 1 : parseFloat(params.data.case_Pack_Qty)) + parseFloat(params.data.minimum_Stock);
-
-            //     let oneWeekVolume = params.data.sales_Units / 4;
-            //     let casePackQtyVolume = oneWeekVolume * self.autoRangeData.casepack_qty;
-
-            //     if (checkValue > casePackQtyVolume && params.data.sales_Units != 0) {
-            //       return {
-            //         backgroundColor: "#f4c086"
-            //       };
-            //     }
-
-            //     // let leadTimeDays = self.autoRangeData.lead_time;
-            //     // let safety_stock_highlightDays = self.autoRangeData.safety_stock_highlight * 7;
-
-            //     // let totalDays = leadTimeDays + safety_stock_highlightDays;
-            //     // let totalWeeks = totalDays / 7;
-
-            //     // let oneWeekVolume = params.data.sales_Units / 4;
-            //     // let safetyVolume = oneWeekVolume * totalWeeks;
-
-            //     // if (params.data.stock_Units < safetyVolume) {
-            //     //   return {
-            //     //     backgroundColor: "#ffa3bc"
-            //     //   };
-            //     // }
-            //   }
-            // };
-
             self.columnDefs[37] = {
               headerName: "Stock Units",
               field: "stock_Units",
@@ -2638,26 +2725,6 @@
 
             self.updateStockColumns();
 
-            // self.columnDefs[38] = {
-            //   headerName: "Minimum Stock",
-            //   field: "surplus_Stock",
-            //   hide: true,
-            //   valueFormatter(params) {
-            //     if (self.showWithConstraints) {
-            //       return 'MEOWWWW';
-            //     }
-
-            //     return 'WOOOF'
-            //   },
-            //   cellStyle(params) {
-            //     if (self.showWithConstraints) {
-            //       return {
-            //         color: 'red'
-            //       }
-            //     }
-            //   }
-            // }
-
             self.columnDefs[44] = {
               headerName: "Surplus Stock",
               field: "surplus_Stock",
@@ -2674,7 +2741,7 @@
               }
             };
 
-            self.columnDefs[45] = {
+            self.columnDefs[46] = {
               headerName: "Case Pack Qty Exceeded",
               field: "case_Pack_Qty_Exceeded",
               hide: true,

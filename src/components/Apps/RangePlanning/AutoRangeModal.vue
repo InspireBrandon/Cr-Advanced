@@ -165,6 +165,22 @@
                   <input v-model="data.dos_units" style="width: 100%; text-align: right;" type="number" />
                 </td>
               </tr>
+              <tr>
+                <td style="padding: 02px!important;"></td>
+                <td>Include Lost Sales From Out Of Stocks</td>
+                <td style="text-align: center;">On/Off</td>
+                <td style="padding: 02px!important; width: 100px;">
+                  <input v-model="data.use_volume_adjusted" type="checkbox" style="width: 100%;" />
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 02px!important;"></td>
+                <td>Add Delisted Items To Packing List</td>
+                <td style="text-align: center;">On/Off</td>
+                <td style="padding: 02px!important; width: 100px;">
+                  <input v-model="data.delisted_to_packinglist" type="checkbox" style="width: 100%;" />
+                </td>
+              </tr>
             </tbody>
           </table>
           <v-divider class="my-2"></v-divider>
@@ -416,6 +432,8 @@
           inclusive_units: 6,
           audit: false,
           dos_units: 6,
+          use_volume_adjusted: true,
+          delisted_to_packinglist: false,
           // Product Supply
           safety_stock_highlight: 1,
           casepack_qty: 12,
@@ -452,7 +470,7 @@
         let safetyStock = parseFloat(self.data.safety_stock_value);
         let totalWeeks = parseFloat(stockLeadWeeks + safetyStock);
 
-        if(totalWeeks > parseFloat(self.data.minumum_stock)) {
+        if (totalWeeks > parseFloat(self.data.minumum_stock)) {
           self.exceedsMin = true;
           return 'auto-range-error';
         }
@@ -468,7 +486,7 @@
         let safetyStock = parseFloat(self.data.safety_stock_value);
         let totalWeeks = parseFloat(stockLeadWeeks + safetyStock);
 
-        if(totalWeeks > parseFloat(self.data.maximum_stock)) {
+        if (totalWeeks > parseFloat(self.data.maximum_stock)) {
           self.exceedsMax = true;
           return 'auto-range-error';
         }

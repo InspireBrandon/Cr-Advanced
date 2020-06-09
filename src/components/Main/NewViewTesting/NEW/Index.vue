@@ -214,6 +214,7 @@
                     self.buildRangePlanningTree();
                     self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
+                    self.buildPackingList();
                     archivedTreeItem.build(self.treeItems);
                     checkPlanogramTreeItem.build(self.treeItems);
                     self.buildFloorPlanningTree();
@@ -231,6 +232,7 @@
                     self.buildRangePlanningTree();
                     self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
+                    self.buildPackingList();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
                     self.buildPromotionalPlanningFolder();
@@ -243,6 +245,7 @@
                     // self.buildRangePlanningTree();
                     self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
+                    self.buildPackingList();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
                     self.buildPromotionalPlanningFolder();
@@ -255,6 +258,7 @@
                     // self.buildRangePlanningTree();
                     // self.buildModelPlanogramTree();
                     self.buildStorePlanogramTree();
+                    self.buildPackingList();
                     self.buildFloorPlanningTree();
                     self.buildClusteringTree();
                     self.buildPromotionalPlanningFolder();
@@ -383,8 +387,11 @@
                                 self.getRangeFileByProjectGroup(department.id,
                                     rangeFiles => {
                                         rangeFiles.forEach(task => {
-                                            var tmpName = task.fileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
-                                            tmpName = tmpName.substring(0, tmpName.length - 4);
+                                            var tmpName = task.fileName.replace(
+                                                    '- XXX ', '').replace('- 6MMA ', '')
+                                                .split('Module')[0];
+                                            tmpName = tmpName.substring(0, tmpName
+                                                .length - 4);
 
                                             let taskItem = new treeItem({
                                                 name: tmpName,
@@ -611,8 +618,11 @@
                                         planogramFiles.forEach(task => {
                                             console.log('task', task);
 
-                                            var tmpName = task.fileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
-                                            tmpName = tmpName.substring(0, tmpName.length - 4);
+                                            var tmpName = task.fileName.replace(
+                                                    '- XXX ', '').replace('- 6MMA ', '')
+                                                .split('Module')[0];
+                                            tmpName = tmpName.substring(0, tmpName
+                                                .length - 4);
 
                                             let taskItem = new treeItem({
                                                 name: tmpName,
@@ -887,9 +897,14 @@
                                         taskInProgress, taskImplemented);
 
                                     departments.forEach(department => {
-                                        if (department.projectGroup == ud.projectGroup) {
-                                            var tmpName = department.fileName.replace('- XXX ', '').replace('- 6MMA ', '').split('Module')[0];
-                                            tmpName = tmpName.substring(0, tmpName.length - 4);
+                                        if (department.projectGroup == ud
+                                            .projectGroup) {
+                                            var tmpName = department.fileName
+                                                .replace('- XXX ', '').replace(
+                                                    '- 6MMA ', '').split('Module')[
+                                                    0];
+                                            tmpName = tmpName.substring(0, tmpName
+                                                .length - 4);
 
                                             let taskItem =
                                                 new treeItem({
@@ -947,6 +962,41 @@
                 })
 
                 self.treeItems.push(storePlanogramTreeItem);
+            },
+            buildPackingList() {
+                let self = this;
+
+                let packingListTreeItem = new treeItem({
+                    name: "Packing List",
+                    icon: "folder",
+                    children: []
+                })
+
+                packingListTreeItem.click = function () {
+                    self.getPackingListStores(stores => {
+                        packingListTreeItem.children = [];
+
+                        stores.forEach(store => {
+                            let storeItem = new treeItem({
+                                name: store.store,
+                                icon: 'insert_drive_file',
+                                children: [],
+                                click: function () {
+                                    self.$router.push(`/PackingList/${store.id}`);
+                                }
+                            })
+
+                            packingListTreeItem.children.push(storeItem);
+                        })
+
+                        packingListTreeItem.showChildren = !packingListTreeItem.showChildren;
+                        packingListTreeItem.icon = packingListTreeItem.showChildren ?
+                            'folder_open' :
+                            'folder';
+                    })
+                }
+
+                self.treeItems.push(packingListTreeItem);
             },
             buildFloorPlanningTree() {
                 let self = this;
@@ -1449,6 +1499,20 @@
                     .then(r => {
                         delete Axios.defaults.headers.common["TenantID"];
                         callback(r.data.queryResult);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    });
+            },
+            getPackingListStores(callback) {
+                let self = this;
+
+                Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                Axios.get(process.env.VUE_APP_API + `StockMovementStores`)
+                    .then(r => {
+                        delete Axios.defaults.headers.common["TenantID"];
+                        callback(r.data);
                     })
                     .catch(e => {
                         console.log(e);

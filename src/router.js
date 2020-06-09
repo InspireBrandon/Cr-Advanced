@@ -74,6 +74,8 @@ import ProductCatalogue from '@/components/Apps/DataPreparation/Types/ProductCat
 import CategoryCode from '@/components/Apps/DataPreparation/Types/CategoryCode/CategoryCode.vue';
 import TestRange from '@/components/Apps/DataPreparation/Types/Test_Range/Index.vue'
 import PlanogramRole from '@/components/Apps/DataPreparation/Types/Planogram_Role/Index.vue'
+import Stock_Movement from '@/components/Apps/DataPreparation/Types/Stock_Movement/Index.vue'
+import Packing_List from '@/components/Apps/DataPreparation/Types/Packing_List/Index.vue'
 
 
 //projectPlanning
@@ -133,6 +135,7 @@ import map2 from '@/components/Apps/Strategy/Map/tesmap.vue'
 import FloorPlanningViewer from '@/components/Main/FloorPlanningViewer/Index'
 import PromotionViewer from '@/components/Main/PromotionViewer'
 import Bi from '@/components/Main/Bi'
+import PackingListReport from '@/components/Main/PackingListReport'
 // Dashboard Designer 
 import DashboardDesigner from '@/components/Main/DashboardDesigner/Index'
 
@@ -159,6 +162,8 @@ import {
 import Promotions from './components/Apps/Promotions/Index.vue'
 import CategoriesAndResources from './components/Apps/Promotions/CategoriesAndResources.vue'
 import Procedure from './components/Apps/Promotions/Procedure/Index.vue'
+
+import RangingAutomation from './components/Apps/Automation/Ranging/Index.vue'
 
 Vue.use(Router)
 
@@ -259,6 +264,11 @@ export default new Router({
               path: '/Bi/:folderFileID',
               name: 'range_planning_view',
               component: Bi,
+            },
+            {
+              path: '/PackingList/:storeID',
+              name: 'packing_list',
+              component: PackingListReport,
             },
             {
               path: '/BasketView/:fileID',
@@ -460,6 +470,11 @@ export default new Router({
           component: PlanogramDetailTool
         },
         {
+          path: "/RangingAutomation",
+          name: "RangingAutomation",
+          component: RangingAutomation
+        },
+        {
           path: "/PlanogramImplementation/:projectTransactionID/:planogramID/:status",
           name: "planogram_implementation",
           component: PlanogramImplementation
@@ -597,6 +612,16 @@ export default new Router({
                 path: 'PlanogramRole',
                 name: 'PlanogramRole',
                 component: PlanogramRole
+              },
+              {
+                path: 'StockMovement',
+                name: 'StockMovement',
+                component: Stock_Movement
+              },
+              {
+                path: 'PackingList',
+                name: 'PackingList',
+                component: Packing_List
               },
               {
                 path: 'Geographic_Location',

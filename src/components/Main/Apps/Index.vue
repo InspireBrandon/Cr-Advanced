@@ -138,10 +138,10 @@
             },
             handleSuperUser(app) {
                 switch (app.system_code) {
-                    case "RANGE-PLANNING": {
-                        app["demo"] = false;
-                    }
-                    break;
+                    // case "RANGE-PLANNING": {
+                    //     app["demo"] = false;
+                    // }
+                    // break;
                 case "SPACE-PLANNING": {
                     app.config.routes = [{
                         "route": "/SpacePlanning",
@@ -195,10 +195,10 @@
                 let self = this;
 
                 switch (app.system_code) {
-                    case "RANGE-PLANNING": {
-                        app["demo"] = false;
-                    }
-                    break;
+                    // case "RANGE-PLANNING": {
+                    //     app["demo"] = false;
+                    // }
+                    // break;
                 case "SPACE-PLANNING": {
                     if (self.systemUserID == 16 || self.systemUserID == 48 || self.systemUserID == 43) {
                         app.config.routes = [{
@@ -243,10 +243,10 @@
             },
             handleSupplier(app) {
                 switch (app.system_code) {
-                    case "RANGE-PLANNING": {
-                        app["demo"] = true;
-                    }
-                    break;
+                    // case "RANGE-PLANNING": {
+                    //     app["demo"] = true;
+                    // }
+                    // break;
                 case "SPACE-PLANNING": {
                     app["demo"] = true;
                 }
@@ -281,10 +281,10 @@
             },
             handleStore(app) {
                 switch (app.system_code) {
-                    case "RANGE-PLANNING": {
-                        app["demo"] = true;
-                    }
-                    break;
+                    // case "RANGE-PLANNING": {
+                    //     app["demo"] = true;
+                    // }
+                    // break;
                 case "SPACE-PLANNING": {
                     app["demo"] = true;
                 }

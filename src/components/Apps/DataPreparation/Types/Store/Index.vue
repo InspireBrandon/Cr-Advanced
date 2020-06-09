@@ -95,7 +95,6 @@
             getStores() {
                 let self = this
 
-
                 Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 Axios.get(process.env.VUE_APP_API + `Retailer/Store`)

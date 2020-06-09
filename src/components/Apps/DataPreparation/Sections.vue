@@ -17,7 +17,7 @@
                                 </v-list-tile-action>
                             </v-list-tile>
                         </v-list-group>
-                         <v-list-group prepend-icon="shopping_cart">
+                        <v-list-group prepend-icon="shopping_cart">
                             <template v-slot:activator>
                                 <v-list-tile>
                                     <v-list-tile-title>Item Fields</v-list-tile-title>
@@ -90,8 +90,8 @@
         name: 'DataImport',
         data: () => {
             return {
-                item_fields:[
- new navItem({
+                item_fields: [
+                    new navItem({
                         name: 'Segment',
                         route: 'Segment'
                     }),
@@ -107,7 +107,7 @@
                         name: 'Department',
                         route: 'Department'
                     }),
-                      new navItem({
+                    new navItem({
                         name: 'Brand',
                         route: 'Brand'
                     }),
@@ -117,11 +117,11 @@
                         name: 'Product Catalogue',
                         route: 'ProductCatalogue'
                     }),
-                     new navItem({
+                    new navItem({
                         name: 'Category Code',
                         route: 'CategoryCode'
                     }),
-                     new navItem({
+                    new navItem({
                         name: 'Supergroup_A',
                         route: 'Supergroup_A'
                     }),
@@ -129,11 +129,21 @@
                         name: 'Supergroup_B',
                         route: 'Supergroup_B'
                     }),
-                     
+
                     new navItem({
                         name: 'Item Status',
                         route: 'Item_Status'
                     }),
+
+                    // new navItem({
+                    //     name: 'Stock Movement',
+                    //     route: 'StockMovement'
+                    // }),
+
+                    // new navItem({
+                    //     name: 'Packing List',
+                    //     route: 'PackingList'
+                    // }),
                 ],
                 market: [
                     new navItem({
@@ -148,12 +158,12 @@
                         name: 'Retail_Chain',
                         route: 'Retail_Chain'
                     }),
-                     new navItem({
+                    new navItem({
                         name: 'Active_Shop_Code',
                         route: 'Active_Shop_Code'
                     }),
                     new navItem({
-                         name: 'Geographic_Location',
+                        name: 'Geographic_Location',
                         route: 'Geographic_Location'
                     }),
                     new navItem({

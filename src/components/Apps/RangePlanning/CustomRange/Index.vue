@@ -38,7 +38,7 @@
                         Products: {{ rowData.length }}
                     </strong>
                     <v-spacer></v-spacer>
-                    <v-btn color="primary" flat @click="submit">Generate Range</v-btn>
+                    <v-btn color="primary" flat>Generate Range</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
