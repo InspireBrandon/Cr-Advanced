@@ -15,6 +15,7 @@
                                     :items="clusterTypes" v-model="settings.selectedClusterType" solo hide-details>
                                 </v-select>
                             </v-flex>
+
                             <v-flex md12 style="padding: 2px;" class="px-2 mb-1">
                                 <v-select light :disabled="settings.selectedClusterType == null"
                                     :placeholder="'Select ' + settings.selectedClusterType + ' cluster'" dense
@@ -104,7 +105,6 @@
             getClusters() {
                 let self = this
                 axios.get(process.env.VUE_APP_API + `Cluster/Store`).then(r => {
-                    self.clusterOptions.stores = []
                     r.data.forEach(store => {
                         self.clusterOptions.cluster.push({
                             text: store.store_Cluster,
@@ -116,6 +116,8 @@
             getStores() {
                 let self = this
                 axios.get(process.env.VUE_APP_API + `Store?db=CR-Devinspire`).then(r => {
+                    self.clusterOptions.stores = [];
+
                     r.data.forEach(store => {
                         self.clusterOptions.stores.push({
                             text: store.storeName,

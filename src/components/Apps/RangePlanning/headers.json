@@ -182,6 +182,7 @@
         "headerName": "Sales",
         "field": "sales_Retail",
         "chartDataType": "series",
+        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -199,6 +200,7 @@
     },
     {
         "headerName": "Sales Potential",
+        "hide": true,
         "field": "sales_potential",
         "filterParams": {
             "newRowsAction": "keep"
@@ -208,6 +210,7 @@
         "headerName": "Sales Potential Rank",
         "field": "sales_potential_rank",
         "sortable": true,
+        "hide": true,
         "sort": "asc",
         "cellStyle": {
             "background-color": "#e4e4e4"
@@ -219,7 +222,6 @@
     {
         "headerName": "Volume",
         "field": "sales_Units",
-        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -278,7 +280,6 @@
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
-        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -286,7 +287,6 @@
     {
         "headerName": "Volume Potential",
         "field": "volume_potential",
-        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -294,7 +294,6 @@
     {
         "headerName": "Volume Potential rank",
         "field": "volume_potential_rank",
-        "hide": true,
         "cellStyle": {
             "background-color": "#e4e4e4"
         },
@@ -417,6 +416,7 @@
     {
         "headerName": "Lost Sales",
         "field": "lost_Sales",
+        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -424,7 +424,6 @@
     {
         "headerName": "Lost Units",
         "field": "lost_Units",
-        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -448,7 +447,6 @@
     {
         "headerName": "Out Of Stock Days",
         "field": "oos_Days",
-        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -471,6 +469,7 @@
     {
         "headerName": "Sales Index",
         "field": "sales_contribution",
+        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }
@@ -478,7 +477,6 @@
     {
         "headerName": "Units Index",
         "field": "units_contribution",
-        "hide": true,
         "filterParams": {
             "newRowsAction": "keep"
         }

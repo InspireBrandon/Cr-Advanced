@@ -16,7 +16,7 @@
         </v-card-title>
         <v-card-text class="pa-0" style="display: block;">
           <grid v-if="dialog" :headers="headers" :rowData="filteredSpacePlans" :setCanDistribute="setCanDistribute"
-            :setComplete="setComplete" :selectedSpacePlan="selectedSpacePlan" :setSelectedPlano="setSelectedPlano" />
+            :setComplete="setComplete" :selectedSpacePlan="selectedSpacePlan" :setSelectedPlano="setSelectedPlano" :setFloorPlan="setFloorPlan" />
           <!-- <v-list class="pa-0" dense hover v-for="(sp, idx) in filteredSpacePlans" :key="idx">
             <v-divider v-if="!sp.archived"></v-divider>
             <v-list-tile :class="{ 'highlighted': selectedSpacePlan == sp  }" avatar @click="selectedSpacePlan = sp"
@@ -74,17 +74,24 @@
         headers: [{
             "headerName": "Name",
             "field": "name",
-            "minWidth": 500,
-          }, {
+            "minWidth": 600,
+          },
+          {
             "headerName": "",
             "hide": false,
-            "maxWidth": 340,
+            "maxWidth": 200,
+            "cellRendererFramework": "FloorPlan"
+          },
+          {
+            "headerName": "",
+            "hide": false,
+            "maxWidth": 200,
             "cellRendererFramework": "completeCheckbox"
           },
           {
             "headerName": "",
             "hide": false,
-            "maxWidth": 340,
+            "maxWidth": 200,
             "cellRendererFramework": "distribute"
           }
         ],
@@ -146,8 +153,6 @@
         Axios.get(process.env.VUE_APP_API + "SystemFile/JSON?db=CR-Devinspire&folder=Space Planning")
           .then(r => {
             self.spaceData = r.data;
-            console.log(self.spaceData);
-
             callback();
           })
           .catch(e => {
@@ -209,6 +214,17 @@
           }
         })
       },
+      setFloorPlan(sp) {
+        let self = this;
+
+        self.$nextTick(() => {
+          Axios.post(process.env.VUE_APP_API +
+              `SystemFile/SetFloorplan?db=CR-DEVINSPIRE&systemFileID=${sp.id}&floorplan=${sp.floorplan}`)
+            .then(r => {
+              console.log(r.data);
+            })
+        })
+      },
       setCanDistribute(sp) {
         let self = this;
 
@@ -230,7 +246,7 @@
               console.log(r.data);
             })
         })
-      }
+      },
     }
   }
 </script>

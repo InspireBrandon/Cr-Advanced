@@ -10,7 +10,7 @@
                     </v-btn>
                 </v-toolbar>
                 <v-card-text class="pt-0" style="height: 600px; overflow-y: scroll;">
-                    <div style="width: 300px">
+                    <div style="width: 380px">
                         <v-select @change="onRoleChange" v-model="selectedRole" label="Role" :items="categoryRoles"
                             item-text="displayname" item-value="id" flat hide-details></v-select>
                     </div>
@@ -184,6 +184,33 @@
                                     <td style="padding: 02px!important; width: 100px;">
                                         <input v-model="data.doS_Units" style="width: 100%; text-align: right;"
                                             type="number" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 02px!important;"></td>
+                                    <td>Include Lost Sales From Out Of Stocks</td>
+                                    <td style="text-align: center;">On/Off</td>
+                                    <td style="padding: 02px!important; width: 100px;">
+                                        <input v-model="data.use_Volume_Adjusted" type="checkbox"
+                                            style="width: 100%;" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 02px!important;"></td>
+                                    <td>Add Delisted Items To Packing List</td>
+                                    <td style="text-align: center;">On/Off</td>
+                                    <td style="padding: 02px!important; width: 100px;">
+                                        <input v-model="data.delisted_To_Packinglist" type="checkbox"
+                                            style="width: 100%;" />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="padding: 02px!important;"></td>
+                                    <td>Use transactional out of stock</td>
+                                    <td style="text-align: center;">On/Off</td>
+                                    <td style="padding: 02px!important; width: 100px;">
+                                        <input v-model="data.use_Transactional_Out_Of_Stock" type="checkbox"
+                                            style="width: 100%;" />
                                     </td>
                                 </tr>
                             </tbody>
@@ -443,6 +470,9 @@
                     inclusive_Units: 6,
                     audit: false,
                     doS_Units: 6,
+                    use_Volume_Adjusted: true,
+                    delisted_To_Packinglist: true,
+                    use_Transactional_Out_Of_Stock: true,
                     minimum_Units: 1,
                     // Product Supply Fields
                     safety_Stock_Highlight: 1,
@@ -481,6 +511,8 @@
                 self.data.potential_Volume = 60;
                 self.data.potential_Profit = 60;
                 self.data.doS_Units = 6;
+                self.data.use_Volume_Adjusted = true;
+                self.data.delisted_To_Packinglist = true;
                 self.data.minimum_Units = 1;
                 self.data.inclusive_Units = 6;
                 self.data.audit = false;
@@ -497,6 +529,7 @@
                 self.data.use_Audit = true;
                 self.data.use_Inclusive_Units = true;
                 self.data.use_Minimum_Units = true;
+                self.data.use_Transactional_Out_Of_Stock = true;
 
                 // Product Supply Fields
                 self.data.safety_Stock_Highlight = 1;

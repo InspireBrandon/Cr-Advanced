@@ -205,6 +205,8 @@
                     requiresSingleSelect: false // Limits selection of values to one.
                 }
 
+                console.log(self.selectedPlanograms, 'self.selectedPlanograms');
+
 
                 if (self.selectedPlanograms.length > 0) {
                     if (self.selectedPlanograms.length == 1 || self.selectedPlanograms.length == 0) {
@@ -298,6 +300,7 @@
                 Axios.get(process.env.VUE_APP_API +
                         `PowerBI/GetReportEmbedConfig?reportID=${self.selectedReport}`)
                     .then(r => {
+                        console.log(r.data);
                         self.generateReport(r.data);
                     })
             },

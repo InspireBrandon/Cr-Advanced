@@ -123,7 +123,9 @@ import ListingView from '@/components/Apps/Strategy/View/Listing/Index.vue'
 import CustomView from '@/components/Apps/Strategy/View/Custom/Index.vue'
 
 // Category Role
-import CategoryRole from '@/components/Apps/CategoryRole/Index.vue'
+import StrategyAndRole from '@/components/Apps/StrategyAndRole/Index.vue'
+import CategoryStrategy from '@/components/Apps/StrategyAndRole/Strategy/Index.vue'
+import CategoryRole from '@/components/Apps/StrategyAndRole/Role/Index.vue'
 
 // import PlanogramDistributionNew from '@/components/Main/PlanogramImplementation/PlanogramOverView/StorePlanogramOverview.vue'
 import PlanogramDistributionNew from '@/components/Main/PlanogramDistribution/PlanogramOverView/StorePlanogramOverview'
@@ -164,6 +166,7 @@ import CategoriesAndResources from './components/Apps/Promotions/CategoriesAndRe
 import Procedure from './components/Apps/Promotions/Procedure/Index.vue'
 
 import RangingAutomation from './components/Apps/Automation/Ranging/Index.vue'
+import FloorPlanningTest from './components/Apps/FloorPlanning/Index.vue'
 
 Vue.use(Router)
 
@@ -190,11 +193,15 @@ export default new Router({
       component: FloorPlanning
     },
     {
+      path: '/FloorPlanningTest',
+      name: 'FloorPlanningTest',
+      component: FloorPlanningTest
+    },
+    {
       path: '/FloorplanDesigner/:ID',
       name: 'floor_plan_designer',
       component: FloorplanDesigner
     },
-    
     {
       path: '/FloorPlanning2D',
       name: 'floor_planning_2d',
@@ -357,9 +364,21 @@ export default new Router({
           component: Clustering
         },
         {
-          path: '/CategoryRole',
+          path: 'CategoryRole',
           name: 'CategoryRole',
-          component: CategoryRole
+          component: StrategyAndRole,
+          children: [
+            {
+              path: 'Strategy',
+              name: 'Strategy',
+              component: CategoryStrategy,
+            },
+            {
+              path: 'Role',
+              name: 'Role',
+              component: CategoryRole,
+            }
+          ]
         },
         {
           path: '/ListingClusters',

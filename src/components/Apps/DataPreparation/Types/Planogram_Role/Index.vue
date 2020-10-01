@@ -15,17 +15,21 @@
                         class="ag-theme-balham" :columnDefs="columnDefs" :rowData="rowData" :sortable="true"
                         :filter="true" :suppressRowClickSelection="true" :enableColResize="true"
                         :enableRangeSelection="true" rowSelection="multiple" :rowDeselection="true" :resizable="true"
-                        :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady"></ag-grid-vue>
+                        :floatingFilter="true" :groupMultiAutoColumn="true" :onGridReady="onGridReady"
+                        :enableFilter="true"></ag-grid-vue>
                 </v-flex>
             </v-layout>
         </v-container>
         <AutoRangeConfigModal ref="autoRangeConfigModal" />
+        <SeasonalityGraph ref="SeasonalityGraph" />
     </div>
 </template>
 
 <script>
     import Axios from 'axios';
     import AutoRangeConfigModal from './AutoRangeConfigModal.vue';
+    import SeasonalityReportButton from './GridComponents/SeasonalityReportButton.vue'
+    import SeasonalityGraph from '../../../RangePlanning/SeasonalityGraph.vue'
 
     import {
         AgGridVue
@@ -34,6 +38,11 @@
         data() {
             return {
                 columnDefs: [{
+                        headerName: "Department",
+                        field: "projectGroup",
+                        sortable: true,
+                    },
+                    {
                         headerName: "Planogram",
                         field: "planogram",
                         sortable: true,
@@ -43,6 +52,11 @@
                         field: "role",
                         sortable: true,
                         editable: true
+                    },
+                    {
+                        headerName: "",
+                        field: "",
+                        cellRendererFramework: "SeasonalityReportButton",
                     }
                 ],
                 rowData: [],
@@ -61,7 +75,9 @@
         },
         components: {
             AgGridVue,
-            AutoRangeConfigModal
+            AutoRangeConfigModal,
+            SeasonalityReportButton,
+            SeasonalityGraph
         },
         created() {
             let self = this;
@@ -71,7 +87,7 @@
         methods: {
             editRoleConfig() {
                 let self = this;
-                
+
                 self.$refs.autoRangeConfigModal.show();
             },
             onGridReady(params) {
@@ -99,13 +115,24 @@
 
                     Axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
-                    Axios.post(process.env.VUE_APP_API + `PlanogramRole?planogramID=${planogramID}&categoryRole=${categoryRole}`)
-                        .then(r => {
-                        })
+                    Axios.post(process.env.VUE_APP_API +
+                            `PlanogramRole?planogramID=${planogramID}&categoryRole=${categoryRole}`)
+                        .then(r => {})
                         .catch(e => {
 
                         })
                 }
+            },
+            getSeasonality(planogramID) {
+                let self = this;
+
+                let queryData = {
+                    planogramID: planogramID,
+                    periodFromID: 67,
+                    periodToID: 78,
+                }
+
+                self.$refs.SeasonalityGraph.show(queryData);
             }
         }
     };

@@ -54,7 +54,8 @@
                     :parentArr="fixtureGroup.children" class="ml-4" :fixtureGroup="fg" :editFixture="editFixture"
                     :deleteFixture="deleteFixture" :openMenuAdd="openMenuAdd" :type="type" :isEdit="isEdit"
                     :selectedItem="selectedItem" :selectLibraryItem="selectLibraryItem" :dragStart="dragStart"
-                    :dragMove="dragMove" :clearDrag="clearDrag" :selectFixture="selectFixture" :isFloorplan="isFloorplan" />
+                    :dragMove="dragMove" :clearDrag="clearDrag" :selectFixture="selectFixture"
+                    :isFloorplan="isFloorplan" :toggleFloorPlan="toggleFloorPlan" />
             </div>
             <div class="ml-4" v-for="(fixture, idx) in fixtureGroup.fixtures" :key="idx">
                 <v-card style="width: 50%; cursor: pointer;" tile flat
@@ -66,6 +67,10 @@
                             draggable="true" @drag="dragMove" @dragstart="dragStart('LIBRARY', fixture)"
                             @dragend="clearDrag">{{ getType(fixture) }} - {{ fixture.name }}</div>
                         <v-spacer></v-spacer>
+                        <div class="mr-2" v-if="type == 1">
+                            <label class="mr-2">floor plan</label>
+                            <input @change="toggleFloorPlan(fixture)" type="checkbox" v-model="fixture.isFloorplan" />
+                        </div>
                         <v-btn v-if="isEdit" class="ma-0 ml-2" small icon @click="editNewFixture(fixture)">
                             <v-icon>edit</v-icon>
                         </v-btn>
@@ -125,7 +130,8 @@
             "dragMove",
             "clearDrag",
             "selectFixture",
-            "isFloorplan"
+            "isFloorplan",
+            "toggleFloorPlan"
         ],
         data() {
             return {};
@@ -190,22 +196,18 @@
                         )
                         .then(r => {
                             self.fixtureGroup.children = [];
-                            console.log("getChildren", r.data.fixtureGroups);
 
                             r.data.fixtureGroups.forEach(fg => {
                                 self.fixtureGroup.children.push(new FixtureGroup(fg));
                             });
-                            console.log("fixtures", self.fixtureGroup.fixtures);
-                            console.log(self.isFloorplan);
-                            
-                            if (self.isFloorplan==true) {
-                                 self.fixtureGroup.fixtures=[]
-                                 r.data.fixtures.forEach(item=>{
-                                     if(item.isFloorplan)
-                                     {
-                                         self.fixtureGroup.fixtures.push(item)
-                                     }
-                                 })
+
+                            if (self.isFloorplan == true) {
+                                self.fixtureGroup.fixtures = []
+                                r.data.fixtures.forEach(item => {
+                                    if (item.isFloorplan) {
+                                        self.fixtureGroup.fixtures.push(item)
+                                    }
+                                })
                             } else {
                                 self.fixtureGroup.fixtures = r.data.fixtures;
                             }

@@ -1,5 +1,9 @@
 [
     {
+        "id": 1,
+        "system_code": "RANGE-PLANNING"
+    },
+    {
         "id": 2,
         "system_code": "SPACE-PLANNING"
     },
@@ -37,10 +41,18 @@
     },
     {
         "id": 11,
-        "system_code": "CATEGORY-ROLE"
+        "system_code": "ECOMMERCE"
     },
     {
         "id": 12,
+        "system_code": "RESEARCH"
+    },
+    {
+        "id": 13,
+        "system_code": "CATEGORY-ROLE"
+    },
+    {
+        "id": 14,
         "system_code": "TESTING"
     }
 ]

@@ -181,6 +181,14 @@
                   <input v-model="data.delisted_to_packinglist" type="checkbox" style="width: 100%;" />
                 </td>
               </tr>
+              <tr>
+                <td style="padding: 02px!important;"></td>
+                <td>Use transactional out of stock</td>
+                <td style="text-align: center;">On/Off</td>
+                <td style="padding: 02px!important; width: 100px;">
+                  <input v-model="data.use_transactional_out_of_stock" type="checkbox" style="width: 100%;" />
+                </td>
+              </tr>
             </tbody>
           </table>
           <v-divider class="my-2"></v-divider>
@@ -434,6 +442,7 @@
           dos_units: 6,
           use_volume_adjusted: true,
           delisted_to_packinglist: false,
+          use_transactional_out_of_stock: true,
           // Product Supply
           safety_stock_highlight: 1,
           casepack_qty: 12,
@@ -542,8 +551,6 @@
           )
           .then(r => {
             let data = r.data;
-
-            console.log(r.data);
 
             for (var prop in data) {
               data[prop.toLowerCase()] = data[prop];

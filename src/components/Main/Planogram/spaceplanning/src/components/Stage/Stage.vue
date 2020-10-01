@@ -111,7 +111,7 @@
     return color;
   }
 
-  for(var i = 0; i < 20; i++) {
+  for (var i = 0; i < 20; i++) {
     colors.push(getRandomColor());
   }
 
@@ -1418,7 +1418,6 @@
         let stage = self.$refs.stage.getStage();
       },
       addNewPoduct(parentId, data, dropPos) {
-        // console.log("[ADD PRODUCT]", data);
         let self = this;
         let stage = self.$refs.stage.getStage();
 
@@ -1437,7 +1436,9 @@
           "PRODUCT",
           parentId
         );
+
         ctrl_product.Initialise(dropPos);
+        
         if (self.ImagesOff)
           ctrl_product.TurnImagesOff();
         else
@@ -1698,6 +1699,12 @@
             changed_gondola.ChangeDimensions(data);
           }
           break;
+        case "OBSTRUCTION": {
+          let ctrl_store = new StoreHelper();
+          let changed_gondola = ctrl_store.getPlanogramItemById(this.$store, data.id);
+          changed_gondola.ChangeDimensions(data);
+        }
+        break;
         case "FIXTURE": {
           let ctrl_store = new StoreHelper();
           let changed_fixture = ctrl_store.getPlanogramItemById(this.$store, data.id);
@@ -1800,10 +1807,6 @@
         let allProductItems = ctrl_store.getAllPlanogramItemsByType(self.$store, "PRODUCT");
 
         allProductItems.forEach(product => {
-          if (product.Data.barcode == '700083657251') {
-            console.log("allProductItems", product);
-          }
-
           product.DisplayProductIndicator();
         });
       },
@@ -1816,68 +1819,71 @@
       getSelectedRenderings(fixture, callback) {
         let self = this
 
-        axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${fixture.id}`)
-          .then(r => {
+        if (fixture != undefined) {
+          axios.get(process.env.VUE_APP_API + `FixtureRenderingLink?db=CR-Devinspire&Fixture_ID=${fixture.id}`)
+            .then(r => {
 
-            if (fixture.RenderingsItems == null || fixture.RenderingsItems == undefined) {
-              let Front
-              fixture.RenderingsItems = {
-                Front
+              if (fixture.RenderingsItems == null || fixture.RenderingsItems == undefined) {
+                let Front
+                fixture.RenderingsItems = {
+                  Front
+                }
               }
-            }
 
-            // self.form.image = r.data;
-            r.data.forEach(item => {
-              switch (item.renderingType) {
-                case 0: {
-                  fixture.RenderingsItems.LabelHolder = item
+              // self.form.image = r.data;
+              r.data.forEach(item => {
+                switch (item.renderingType) {
+                  case 0: {
+                    fixture.RenderingsItems.LabelHolder = item
+                    if (fixture.frontImageID != null) {
+                      fixture.RenderingsItems.LabelHolder.image = process.env.VUE_APP_API +
+                        `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                    }
+                  }
+                  break;
+                case 1: {
+                  fixture.RenderingsItems.ShelfEdge = item
                   if (fixture.frontImageID != null) {
-                    fixture.RenderingsItems.LabelHolder.image = process.env.VUE_APP_API +
+                    fixture.RenderingsItems.ShelfEdge.image = process.env.VUE_APP_API +
                       `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
                   }
                 }
                 break;
-              case 1: {
-                fixture.RenderingsItems.ShelfEdge = item
-                if (fixture.frontImageID != null) {
-                  fixture.RenderingsItems.ShelfEdge.image = process.env.VUE_APP_API +
-                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                case 2: {
+                  fixture.RenderingsItems.Back = item
+                  if (fixture.frontImageID != null) {
+                    fixture.RenderingsItems.Back.image = process.env.VUE_APP_API +
+                      `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                  }
                 }
-              }
-              break;
-              case 2: {
-                fixture.RenderingsItems.Back = item
-                if (fixture.frontImageID != null) {
-                  fixture.RenderingsItems.Back.image = process.env.VUE_APP_API +
-                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
-                }
-              }
-              break;
-              case 3: {
-                // front
-                fixture.RenderingsItems.Front = item
-                if (fixture.frontImageID != null) {
-                  fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
-                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
-                }
-
-              }
-              break;
-              case 4: {
-                fixture.RenderingsItems.Side = item
-                if (fixture.frontImageID != null) {
-                  fixture.RenderingsItems.Side.image = process.env.VUE_APP_API +
-                    `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
-                }
-              }
-              break;
-              default:
                 break;
-              }
-            })
-            callback(fixture)
-          })
+                case 3: {
+                  // front
+                  fixture.RenderingsItems.Front = item
+                  if (fixture.frontImageID != null) {
+                    fixture.RenderingsItems.Front.image = process.env.VUE_APP_API +
+                      `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                  }
 
+                }
+                break;
+                case 4: {
+                  fixture.RenderingsItems.Side = item
+                  if (fixture.frontImageID != null) {
+                    fixture.RenderingsItems.Side.image = process.env.VUE_APP_API +
+                      `FixtureImage?db=CR-Devinspire&fixtureImageID=${item.id}`
+                  }
+                }
+                break;
+                default:
+                  break;
+                }
+              })
+              callback(fixture)
+            })
+        } else {
+          callback();
+        }
       },
       dropDragItem(ev) {
         ev.preventDefault();
@@ -1898,11 +1904,8 @@
         }
 
         //#endregion
-
-
-
-        if (data.type != undefined) {
-          console.log("DATA TYPE", data.type)
+        if (data.type != undefined && dragType != 'WAREHOUSE') {
+          console.log("DATA TYPE", data.type, dragType)
 
           if (data.type == "CUSTOM" || data.type == "CUSTOM_PLANOGRAM") {
             self.addItem(dragType, stage, data, ev);
@@ -1966,19 +1969,18 @@
       },
       addWarehouseProduct(stage, data, ev) {
         let self = this;
+        
         if (data == null) {
           alert("There is no warehouse data selected, please try again.");
           return;
         }
-        console.log("ADDING WAREHOUSE PRODUCT", data, ev);
+
         let container = stage.container().getBoundingClientRect();
         stage._setPointerPosition(ev);
 
         let ctrl_intersectionTester = new IntersectionTester();
-
         let dropPos = ctrl_intersectionTester.GetTransformedMousePoint(stage);
 
-        console.log("SHELF ADD - STAGE", dropPos);
         ctrl_intersectionTester.TestIntersectsWithMany(stage, "PRODUCT", ["SHELF", "BASE", "PEGBAR", "PEGBOARD",
               "BASKET",
               "PEG",
@@ -1988,12 +1990,10 @@
             ], self.$store,
             dropPos)
           .then(result => {
-            console.log("[WAREHOUSE ADD] PRODUCT", result)
             if (result.intersects == true) {
               self.addNewPoduct(result.ID, data, result.ContainerPosition);
             }
           })
-
       },
       addLibraryItem(stage, data, ev) {
         let self = this;
@@ -2016,7 +2016,8 @@
           break;
         case "OBSTRUCTION": {
           //
-          self.addNewObstruction(data.data);
+          self.addNewGondola(data.data);
+          // self.addNewObstruction(data.data);
         }
         break;
         case "LABELHOLDER": {

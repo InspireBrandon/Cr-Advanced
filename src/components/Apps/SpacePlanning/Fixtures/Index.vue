@@ -15,7 +15,7 @@
 
             <v-tab href="#tab-floorplan" justify-content: center fixed-tabs>Floorplan</v-tab>
 
-            <v-tab href="#tab-6" justify-content: center fixed-tabs>Planograms</v-tab>
+            <v-tab href="#tab-6" justify-content: center fixed-tabs>Custom</v-tab>
 
             <v-tab-item id="tab-main" class="elevation-2" justify-content: center>
               <v-card justify-content: center class="tab-item-wrapper elevation-2 back-height">
@@ -46,6 +46,7 @@
                       :dragStart="dragPlaceHolder"
                       :dragMove="dragPlaceHolder"
                       :clearDrag="dragPlaceHolder"
+                      :toggleFloorPlan="toggleFloorPlan"
                     ></FixtureRecursive>
                   </v-flex>
                 </v-card-text>
@@ -259,7 +260,6 @@ export default {
       });
     }
   },
-
   mounted() {
     let self = this;
 
@@ -546,7 +546,7 @@ export default {
     getFloorPlans() {
       let self = this;
 
-      Axios.get(process.env.VUE_APP_API + 'SystemFile/JSON/FloorPlan?db=CR-Devinspire')
+      Axios.get(process.env.VUE_APP_API + `SystemFile/JSON?db=CR-Devinspire&folder=FIXTURES`)
         .then(r => {
           self.floorPlans = r.data;
         })
@@ -559,6 +559,16 @@ export default {
 
       self.$refs.fixtureSelector.show((fixtureID, sp) => {
         callback(fixtureID, sp);
+      })
+    },
+    toggleFloorPlan(fixture) {
+      let self = this;
+
+      self.$nextTick(() => {
+        Axios.put(process.env.VUE_APP_API + "Fixture?db=CR-Devinspire", fixture)
+          .then(r => {
+
+          })
       })
     }
   }

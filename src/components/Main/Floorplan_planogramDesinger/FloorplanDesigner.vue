@@ -137,28 +137,21 @@
             open(planogram_ID) {
                 let self = this
                 self.planogram_ID = planogram_ID
-                console.log("planogram_ID", self.planogram_ID);
 
                 self.dialog = true
                 self.initialise()
             },
             log() {
                 let self = this
-                console.log(self.selectedLayer);
-
             },
             checkForHeader(callback) {
                 let self = this
-                console.log("params", self.$route.params.ID);
-
 
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
 
                 axios.post(process.env.VUE_APP_API + `FloorPlanheader/Exisitng?Planogram_ID=${self.planogram_ID}`)
                     .then(
                         r => {
-                            console.log("CHECK HEADER", r);
-
                             callback(r.data)
                         })
             },
@@ -176,8 +169,6 @@
                     }
 
                     if (reqObj.guid == undefined || reqObj.guid == null) {
-                        console.log("FormatItems", reqObj);
-
                         reqObj.guid = self.guid()
                     }
 
@@ -185,6 +176,7 @@
                     if (item.children.length > 0) {
                         self.FormatItems(item.children, reqObj.children, item.attrs.DropID, recCall => {})
                     }
+
                     if (idx + 1 == menuItems.length) {
                         callback()
                     }
@@ -197,16 +189,9 @@
                 self.stage.batchDraw()
                 axios.post(process.env.VUE_APP_API + `FloorplanFixtureHeader?&Planogram_ID=${self.planogram_ID}`).then(
                     r => {
-                        console.log("[header]", r);
-
                         if (r.data != null) {
                             self.saveArr = []
-                            console.log(self.stage.children[1].children);
-
                             self.FormatItems(self.stage.children[1].children, self.saveArr, 0, callback => {
-                                console.log("self.saveArr", self.saveArr);
-
-                                console.log(self.saveArr)
                                 axios.post(process.env.VUE_APP_API +
                                         `FloorplanFixtureItem?Header_id=${r.data.id}`, self.saveArr)
                                     .then(resp => {
@@ -258,16 +243,11 @@
                         item = drop
                     }
                 })
-                console.log("redreaw", item);
 
                 let tmp
                 self.findKonvaItem(self.selectedLayer.children, item.id, callback => {
-                    console.log("callback", callback);
-                    console.log(item);
                     let asd = self.selectedLayer.children.splice(callback.count, 1)
                     tmp = asd[0]
-                    console.log("[REDRAW]--item", tmp);
-
 
                     if (self.properties.shape == "Circle") {
                         let circle = new Circle(self.selectedLayer, {
@@ -282,17 +262,17 @@
                         })
                         circle.shape.attrs.DropID = item.id.toString()
                     } else {
-                        console.log("square", tmp);
                         let rect = new Rect(self.selectedLayer, {
                             x: tmp.attrs.x,
                             y: tmp.attrs.y,
                         }, null, null, null, self.imageSrc(item.id, "Top"));
+
                         rect.shape.setAttrs({
                             width: item.width,
                             height: item.height
                         })
+
                         rect.shape.attrs.rotation = parseFloat(self.properties.rotation)
-                        console.log("rect", rect);
 
                         rect.shape.attrs.DropID = item.id.toString()
                     }
@@ -320,7 +300,9 @@
             },
             getPlanogramData(callback) {
                 let self = this
+
                 axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
                 if (self.$route.params.ID != null && self.$route.params.ID != "ID") {
                     self.planogram_ID = self.$route.params.ID
                 }
@@ -328,7 +310,7 @@
                 axios.get(process.env.VUE_APP_API +
                     `FloorPlan_Fixtures/GetFixtures?planogramDetail_ID=${self.planogram_ID}`).then(
                     r => {
-                        console.log("getPlanogramData", r.data);
+                        console.log('drops', r.data);
                         self.drops = r.data
                         self.fixtureHeaderID = self.drops[0].floorplan_Fixture_Header_ID
                         callback()
@@ -349,7 +331,6 @@
                 let self = this
 
                 self.properties.rotation = item.attrs.rotation.toFixed(0)
-                console.log("set props------", item.attrs.rotation);
                 if (item.attrs.name == "Circle") {
                     self.properties.shape = "Circle"
                 } else {
@@ -364,14 +345,12 @@
 
                         if (self.selectedItem == null) {
                             self.selectedItem = e.target.parent
-                            console.log("self.selectedItem", self.selectedItem);
                             self.selectedItem.draggable(true)
                             self.selectedItem.children.forEach(child => {
                                 child.draggable(false)
                             })
                         } else if (self.selectedItem.parent.attrs.name != "planoGroup") {
                             self.selectedItem = e.target
-                            console.log("self.selectedItem", self.selectedItem);
                             self.selectedItem.draggable(true)
                             self.findDrop(e.target, callback => {
                                 self.setproperties(e.target)
@@ -379,7 +358,6 @@
                             })
                         } else {
                             self.selectedItem = e.target.parent
-                            console.log("self.selectedItem", self.selectedItem);
                             self.selectedItem.draggable(true)
                             self.selectedItem.children.forEach(child => {
                                 child.draggable(false)
@@ -411,17 +389,13 @@
 
                         tr.attachTo(self.selectedItem);
                         tr.on('transform', function (z) {
-                            console.log("transform");
                             self.findDrop(e.target, callback => {
-                                console.log(callback);
-
                                 callback.rotation = e.target.attrs.rotation
                             })
                         });
                         self.stage.batchDraw();
                     }
                 });
-
                 self.stage.on('dragmove', function (e) {
 
                     let snappingHandler = new SnappingHandler()
@@ -490,30 +464,8 @@
                         }
                     });
                 });
-
                 self.stage.on('dragend', (e) => {
                     self.stage.find('.guid-line').destroy();
-
-                    // // clear all previous lines on the screen
-                    // self.stage.find('.guid-line').destroy();
-                    // let transform = self.stage.getAbsoluteTransform().copy();
-                    // transform.invert();
-                    // // let pos = self.stage.getPointerPosition();
-
-                    // console.log("drag evvent", e);
-                    // let abs = e.target.absolutePosition()
-
-
-                    // let dropPos = transform.point({
-                    //     x: e.target.attrs.x,
-                    //     y: e.target.attrs.y
-                    // });
-
-                    // e.target.setAttrs({
-                    //     x: dropPos.x,
-                    //     y: dropPos.y
-                    // })
-
 
                     self.stage.batchDraw();
                 })
@@ -583,7 +535,6 @@
 
                 })
                 self.selectedLayer.on("mouseout", (e) => {
-                    console.log(e.target);
                     if (tooltip != null) {
                         tooltip.destroy()
                     }
@@ -709,9 +660,6 @@
                 let self = this
                 let shape = JSON.parse(item.attributes)
 
-                console.log("Shape", shape)
-                console.log("item", item)
-
                 switch (shape.name) {
                     case "Gondola-Rect": {
                         let rect = new Rect(parent, {
@@ -767,21 +715,81 @@
             drawSaved(cb) {
                 let self = this
                 self.getSavedData(cb.id, data => {
-                    console.log('[GETSAVEDDATA]', data);
-                    let shape = JSON.parse(data[0].attributes)
+                    if (data.length > 0) {
+                        let shape = JSON.parse(data[0].attributes)
 
-                    self.selectedLayer.attrs = shape
-                    data[0].children.forEach((item, idx) => {
-                        self.addShape(self.selectedLayer, item, callback => {
-                            if (idx == data[0].children.length - 1) {
-                                self.$refs.spinner.hide()
+                        self.selectedLayer.attrs = shape
+                        data[0].children.forEach((item, idx) => {
+                            self.addShape(self.selectedLayer, item, callback => {
+                                if (idx == data[0].children.length - 1) {
+                                    self.$refs.spinner.hide()
+                                }
+                            })
+                        })
+                    } else {
+                        let widthInc = 0
+                        let lastPos = 50
+                        self.drops.forEach((element, idx) => {
+
+                            if (element.shape == "Circle") {
+                                let circle = new Circle(self.selectedLayer, {
+                                    x: 0,
+                                    y: 0,
+                                }, null, {
+                                    radius: element.width,
+                                    color: "#1976d2"
+                                });
+                                circle.shape.setAttrs({
+                                    width: element.width,
+                                    depth: element.depth,
+                                    DropID: element.id.toString()
+                                })
+                                circle.shape.parent.setAttrs({
+                                    x: lastPos,
+                                    y: 75
+                                })
+                                circle.shape.attrs.DropID = element.id.toString()
+                                lastPos = circle.shape.attrs.x + element.width
+                                circle.shape.draggable(true)
+
+                            } else {
+                                element.shape = "Square"
+                                let rect = new Rect(self.selectedLayer, {
+                                    x: 0,
+                                    y: 0,
+                                }, null, null, null, self.imageSrc(element
+                                    .id,
+                                    "Top"));
+                                rect.shape.setAttrs({
+                                    width: element.width,
+                                    height: element.height,
+                                    depth: element.depth,
+
+                                    draggable: true
+                                })
+                                rect.shape.setAttrs({
+                                    x: lastPos,
+                                    y: 50
+                                })
+
+                                rect.shape.setAttrs({
+                                    width: element.width,
+                                    height: element.height,
+                                })
+
+                                rect.shape.attrs.DropID = element.id
+                                    .toString()
+                                lastPos = rect.shape.attrs.x + element.width
+                                rect.shape.draggable(true)
+
                             }
 
+                            widthInc = element.width
+                            self.snapableItems.push("." + element.id.toString())
+                            self.stage.batchDraw()
+                            self.$refs.spinner.hide()
                         })
-                    })
-
-                    console.log("[drawSaved]-----selectedLayer", self.selectedLayer);
-
+                    }
                 })
             },
             getSavedData(header, callback) {
@@ -801,7 +809,7 @@
                     self.drawGrid()
                     self.addStageEvents()
                     self.stage.batchDraw()
-                    console.log("stage", self.stage);
+
                     self.getPlanogramData(callback => {
                         if (cb == null) {
                             let widthInc = 0
@@ -853,7 +861,7 @@
                                         width: element.width,
                                         height: element.height,
                                     })
-                                    console.log("rect", rect);
+
                                     rect.shape.attrs.DropID = element.id
                                         .toString()
                                     lastPos = rect.shape.attrs.x + element.width
@@ -877,7 +885,7 @@
                 let self = this;
                 var group = self.stage.find('.planoGroup')[0];
                 let groupData = group.getClientRect();
-                
+
                 let drops = self.drops;
                 self.$refs.threeDee.show(self.fixtureHeaderID, drops, groupData);
             }

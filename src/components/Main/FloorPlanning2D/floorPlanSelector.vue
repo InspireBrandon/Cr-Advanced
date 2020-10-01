@@ -14,10 +14,8 @@
                 </v-card-title>
 
                 <v-card-text>
-                    <v-list dense hover v-for="(File, idx) in filteredList" :key="idx">
-                        <v-divider></v-divider>
-                        <v-list-tile :class="{ 'highlighted': selectedFile == File  }" avatar
-                            @click="selectedFile = File">
+                    <v-list dense hover>
+                        <v-list-tile :class="{ 'highlighted': selectedFile == File  }" avatar @click="selectedFile = File" v-for="(File, idx) in filteredList" :key="idx">
 
                             <v-list-tile-content>
                                 <v-list-tile-title v-text="File.name"></v-list-tile-title>

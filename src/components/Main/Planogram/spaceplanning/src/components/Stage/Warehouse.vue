@@ -57,7 +57,7 @@
               <v-list-tile-title>Open</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="openFixture">
-              <v-list-tile-title>Open Fixture</v-list-tile-title>
+              <v-list-tile-title>Open Custom Fixture</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="importRange">
               <v-list-tile-title>Select Range</v-list-tile-title>
@@ -72,7 +72,7 @@
               <v-list-tile-title>Save New</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="saveFixture">
-              <v-list-tile-title>Save As Fixture</v-list-tile-title>
+              <v-list-tile-title>Save As Custom Fixture</v-list-tile-title>
             </v-list-tile>
             <v-list-tile @click="rangeToPlanogram">
               <v-list-tile-title>Range To Planogram</v-list-tile-title>
@@ -185,8 +185,8 @@
                 <v-flex xs2 v-if="(rangingData.planogramID != null && gotData)" md3 style="padding: 2px;">
                   <v-btn small color="error" @click="removeHybridRange">Delete </v-btn>
                 </v-flex>
-                <v-flex xs2 v-if="scanProducts" md3 style="padding: 2px;">
-                  <v-btn small color="primary" @click="scan">Scan </v-btn>
+                <v-flex xs2 v-if="scanProducts" md3 style="padding: 2px; display: flex;">
+                  <v-btn small color="primary" @click="scan('db')">Scan</v-btn>
                 </v-flex>
                 <v-flex v-if="rangingData.planogramID != null" md6 style="padding: 2px;">
 
@@ -1048,17 +1048,17 @@
             self.products.forEach(product => {
               if (inIndex(product.description, self.searchText) || inIndex(product.barcode, self.searchText))
                 tmp.push(product);
-              final.push(product)
             })
           }
 
-          // if (tmp.length > 0) {
-          //   for (var i = 0; i < tmp.length; i++) {
-          //     let element = tmp[i];
-          //     if (!self.productInStore(element.productID)) {
-          //     }
-          //   }
-          // }
+          if (tmp.length > 0) {
+            for (var i = 0; i < tmp.length; i++) {
+              let element = tmp[i];
+              if (!self.scanProductInStore(element.id)) {
+                final.push(product)
+              }
+            }
+          }
         }
 
         return final;
@@ -1089,10 +1089,9 @@
     methods: {
       scan() {
         let self = this;
-
         self.$refs.ScanProduct.show(self.onAddProduct);
       },
-      onAddProduct(newProduct) {
+      onAddProduct(newProduct, addToLibrary) {
         let self = this;
 
         let canAdd = true;
@@ -1101,6 +1100,10 @@
           if (product.barcode == newProduct.barcode)
             canAdd = false;
         });
+
+        if (addToLibrary) {
+          newProduct['isNplProduct'] = true;
+        }
 
         if (canAdd) {
           self.products.push(newProduct);
@@ -1608,6 +1611,22 @@
         for (let index = 0; index < products.length; index++) {
           const element = products[index];
           if (element.Data.productID == productID)
+            retval = true;
+        }
+
+        return retval;
+      },
+      scanProductInStore(productID) {
+        let self = this;
+
+        let retval = false;
+        let products = self.$store.getters.getAllPlanogramActiveProducts;
+
+        for (let index = 0; index < products.length; index++) {
+          const element = products[index];
+          console.log('[ELEMENT]', element)
+
+          if (element.Data.id == productID)
             retval = true;
         }
 

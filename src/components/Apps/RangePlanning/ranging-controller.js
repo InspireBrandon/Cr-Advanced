@@ -42,7 +42,7 @@ class RangingController {
     self.allRangeProducts.forEach(rp => {
       let parsedCPQ = parseInt(rp.case_Pack_Qty);
 
-      if(parsedCPQ == undefined || parsedCPQ == null || isNaN(parsedCPQ) || parsedCPQ < 1) {
+      if (parsedCPQ == undefined || parsedCPQ == null || isNaN(parsedCPQ) || parsedCPQ < 1) {
         rp.case_Pack_Qty = 1;
       }
     })
@@ -107,7 +107,7 @@ class RangingController {
   getAverageStock(type, callback) {
     let self = this;
 
-    Axios.get(process.env.VUE_APP_API + `Ranging/AverageStock?planogramID=${self.planogramID}&periodFromID=${self.dateFrom}&periodToID=${self.dateTo}&type=${type}`)
+    Axios.get(process.env.VUE_APP_API + `Ranging/AverageStock?planogramID=${self.planogramID}&periodFromID=${self.dateFrom - 6}&periodToID=${self.dateTo}&type=${type}`)
       .then(r => {
         self.averageStock = r.data;
         callback();
@@ -196,7 +196,6 @@ class RangingController {
         for (var i = ((data.length / 2)); i < data.length; i++) {
           let el = data[i];
           rangeVolume += el.volume;
-          console.log(el);
         }
 
         rangeVolume = rangeVolume / (data.length / 2);
@@ -254,8 +253,6 @@ class RangingController {
         seasonalData.seasonalPercent = (seasonalDiff / seasonalData.average) * 100;
 
         seasonalData.inSeason = seasonalData.rangeVolume > seasonalData.average;
-
-        console.log('seasonalData', seasonalData);
 
         callback();
       })
@@ -476,6 +473,12 @@ class RangingController {
   setClusterIndicator(clusterType, clusterID, productID, indicator) {
     let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
 
+    if (stores[0] == 1) {
+      stores = [{
+        storeID: clusterID
+      }];
+    }
+
     stores.forEach(store => {
       this.storeSales.forEach(storeSales => {
         if (store.storeID == storeSales.storeID) {
@@ -515,6 +518,12 @@ class RangingController {
 
   setTestClusterIndicator(clusterType, clusterID, productID, indicator) {
     let stores = getStoresByCluster(this.clusterData, clusterType, clusterID);
+
+    if (stores[0] == 1) {
+      stores = [{
+        storeID: clusterID
+      }];
+    }
 
     stores.forEach(store => {
       this.storeSales.forEach(storeSales => {
@@ -1113,8 +1122,10 @@ function getOosDaysStore(storeSales, productID, storeID) {
     if (store.storeID == storeID) {
       store.salesData.forEach(product => {
         if (product.productID == productID) {
-          if (numberifySales(product.ooS_Days) > 0)
+          if (numberifySales(product.ooS_Days) > 0) {
             oosDays += numberifySales(product.ooS_Days);
+            console.log(product);
+          }
         }
       })
     }
@@ -1485,19 +1496,41 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
       }
     };
 
+    let use_adjuested = false;
+    let arminumum_stock = 0;
+    let armaximum_stock = 0;
+    let aruse_seasonal_index = false;
+    let arsurplus_stock = 0;
+    let aruse_transaction_oos = false;
+
+    if (autoRangeData != undefined && autoRangeData != null) {
+      use_adjuested = autoRangeData.use_volume_adjusted;
+      arminumum_stock = autoRangeData.minumum_stock;
+      armaximum_stock = autoRangeData.maximum_stock;
+      aruse_seasonal_index = autoRangeData.use_seasonal_index;
+      arsurplus_stock = autoRangeData.surplus_stock;
+      aruse_transaction_oos = autoRangeData.use_transactional_out_of_stock;
+    }
+
     let calculated_oos_days = getOosDaysStore(storeSales, product.productID, storeID);
+
+    let oosMonths = 6 - ((calculated_oos_days / (30 * 6)) * 6);
+
+    if(!aruse_transaction_oos) {
+      sales_units = (sales_units * 6) / oosMonths;
+    }
+
     let lost_units = (parseFloat(sales_units * 6).toFixed(1) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
     let volume_adjusted = sales_units + lost_units;
 
-    let use_adjuested = (autoRangeData == undefined || autoRangeData == null || autoRangeData.use_volume_adjusted == undefined || autoRangeData.use_volume_adjusted == null) ? false : autoRangeData.use_volume_adjusted;
     let volumeToUse = use_adjuested ? volume_adjusted : sales_units;
 
     let lost_sales = (parseFloat(sales_retail * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
     let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
 
-    let salesToUse = autoRangeData.use_volume_adjusted ? (lost_sales + sales_retail) : sales_retail;
-    let costToUse = autoRangeData.use_volume_adjusted ? (lost_cost + sales_cost) : sales_cost;
-    
+    let salesToUse = use_adjuested ? (lost_sales + sales_retail) : sales_retail;
+    let costToUse = use_adjuested ? (lost_cost + sales_cost) : sales_cost;
+
     let sales_profit = salesToUse - costToUse;
     let lost_profit = (parseFloat(sales_profit * 6).toFixed(0) / ((30 * 6) - calculated_oos_days) * calculated_oos_days) / 6;
 
@@ -1521,7 +1554,12 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let average_cost = isNaN(costToUse / volume_adjusted) ? 0 : costToUse / volume_adjusted;
     let average_price = isNaN(salesToUse / volume_adjusted) ? 0 : salesToUse / volume_adjusted;
 
-    let days_of_supply = isNaN(new_Stock_Units / volumeToUse * 30) ? 0 : new_Stock_Units / volumeToUse * 30;
+    let days_of_supply = 0;
+
+    if (new_Stock_Units != 0 && volumeToUse != 0) {
+      days_of_supply = isNaN(new_Stock_Units / volumeToUse * 30) ? 0 : new_Stock_Units / volumeToUse * 30;
+    }
+
     let stock_turn = isNaN((sales_cost * 12) / average_Stock) ? 0 : (sales_cost * 12) / average_Stock;
 
     let gross_profit = ((selling_price - cost_price) / selling_price) * 100;
@@ -1529,19 +1567,19 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
 
     let oneWeekStock = volumeToUse / 4;
 
-    let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
-    let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
+    let minimum_Stock = oneWeekStock * arminumum_stock;
+    let maximum_Stock = oneWeekStock * armaximum_stock;
 
     let inSeasonRatio = ((seasonalData.averageHigh - seasonalData.rangeVolume) / seasonalData.averageHigh);
     let outSeasonRatio = ((seasonalData.rangeVolume - seasonalData.averageLow) / seasonalData.rangeVolume);
 
-    let seasonal_Minimum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
-    let seasonal_Maximum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+    let seasonal_Minimum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * arminumum_stock;
+    let seasonal_Maximum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * armaximum_stock;
 
-    let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
-    let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+    let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * arminumum_stock;
+    let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * armaximum_stock;
 
-    let surplusRequired = oneWeekStock * parseFloat(autoRangeData.surplus_stock);
+    let surplusRequired = oneWeekStock * parseFloat(arsurplus_stock);
     let surplus_Stock = new_Stock_Units - surplusRequired;
 
     let casePackFix = (product.case_Pack_Qty == undefined || product.case_Pack_Qty == null || parseFloat(product.case_Pack_Qty) < 1) ? 1 : parseFloat(product.case_Pack_Qty);
@@ -1555,8 +1593,8 @@ function getTotalStoreProductSales(allProducts, sales, storeSales, stores, store
     let case_Pack_Qty_Exceeded = 0;
 
     if (casePackFix > 1) {
-      let min = autoRangeData.use_seasonal_index ? seasonal_Minimum_Out : minimum_Stock;
-      let max = autoRangeData.use_seasonal_index ? seasonal_Minimum : maximum_Stock;
+      let min = aruse_seasonal_index ? seasonal_Minimum_Out : minimum_Stock;
+      let max = aruse_seasonal_index ? seasonal_Minimum : maximum_Stock;
 
       if (max > 0) {
         let minMaxDiff = min - 1;
@@ -1710,19 +1748,40 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       }
     };
 
+    let use_adjuested = false;
+    let arminumum_stock = 0;
+    let armaximum_stock = 0;
+    let aruse_seasonal_index = false;
+    let arsurplus_stock = 0;
+    let aruse_transaction_oos = false;
+
+    if (autoRangeData != undefined && autoRangeData != null) {
+      use_adjuested = autoRangeData.use_volume_adjusted;
+      arminumum_stock = autoRangeData.minumum_stock;
+      armaximum_stock = autoRangeData.maximum_stock;
+      aruse_seasonal_index = autoRangeData.use_seasonal_index;
+      arsurplus_stock = autoRangeData.surplus_stock;
+      aruse_transaction_oos = autoRangeData.use_transactional_out_of_stock;
+    }
 
     let calculated_oos_days = getOosDays(storeSales, product.productID, clusters, clusterType, clusterID);
+
+    let oosMonths = ((6 * clusterStores.length) - ((calculated_oos_days.oos_days / (clusterStores.length * (30 * 6))) * (6 * clusterStores.length)) / clusterStores.length) / clusterStores.length;
+
+    if(!aruse_transaction_oos) {
+      sales_units = (sales_units * 6) / oosMonths;
+    }
+
     let lost_units = (parseFloat(sales_units * 6).toFixed(1) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
     let volume_adjusted = sales_units + lost_units;
 
-    let use_adjuested = (autoRangeData == undefined || autoRangeData == null || autoRangeData.use_volume_adjusted == undefined || autoRangeData.use_volume_adjusted == null) ? false : autoRangeData.use_volume_adjusted;
     let volumeToUse = use_adjuested ? volume_adjusted : sales_units;
 
     let lost_sales = (parseFloat(sales_retail * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
-    let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days  / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
+    let lost_cost = (parseFloat(sales_cost * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6;
 
-    let salesToUse = autoRangeData.use_volume_adjusted ? (lost_sales + sales_retail) : sales_retail;
-    let costToUse = autoRangeData.use_volume_adjusted ? (lost_cost + sales_cost) : sales_cost;
+    let salesToUse = use_adjuested ? (lost_sales + sales_retail) : sales_retail;
+    let costToUse = use_adjuested ? (lost_cost + sales_cost) : sales_cost;
 
     let sales_profit = salesToUse - costToUse;
     let lost_profit = (parseFloat(sales_profit * 6).toFixed(0) / ((30 * 6) - (calculated_oos_days.oos_days / clusterStores.length)) * (calculated_oos_days.oos_days / clusterStores.length)) / 6 / clusterStores.length;
@@ -1744,12 +1803,17 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let new_Stock_Units = getStockUnits(averageStock, product.productID, clusters, clusterType, clusterID);
     let average_Stock = getAverageStock(averageStock, product.productID, clusters, clusterType, clusterID);
 
-    let oos_days = calculated_oos_days.oos_days / calculated_oos_days.stores / 6;
+    let oos_days = calculated_oos_days.oos_days / calculated_oos_days.stores /  6;
 
     let average_cost = isNaN(costToUse / volumeToUse) ? 0 : costToUse / volumeToUse;
     let average_price = isNaN(salesToUse / volumeToUse) ? 0 : salesToUse / volumeToUse;
 
-    let days_of_supply = isNaN(new_Stock_Units / volumeToUse * 30) ? 0 : new_Stock_Units / volumeToUse * 30;
+    let days_of_supply = 0;
+
+    if (new_Stock_Units != 0 && volumeToUse != 0) {
+      days_of_supply = isNaN(new_Stock_Units / volumeToUse * 30) ? 0 : new_Stock_Units / volumeToUse * 30;
+    }
+
     let stock_turn = isNaN((sales_cost * 12) / average_Stock) ? 0 : (sales_cost * 12) / average_Stock;
 
     let totalDays = 30 * 6 * clusterStores.length;
@@ -1757,21 +1821,21 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
 
     let oneWeekStock = volumeToUse / 4;
 
-    let minimum_Stock = oneWeekStock * autoRangeData.minumum_stock;
-    let maximum_Stock = oneWeekStock * autoRangeData.maximum_stock;
+    let minimum_Stock = oneWeekStock * arminumum_stock;
+    let maximum_Stock = oneWeekStock * armaximum_stock;
 
     let inSeasonRatio = ((seasonalData.averageHigh - seasonalData.rangeVolume) / seasonalData.averageHigh);
     let outSeasonRatio = ((seasonalData.rangeVolume - seasonalData.averageLow) / seasonalData.rangeVolume);
 
-    let seasonal_Minimum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
-    let seasonal_Maximum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+    let seasonal_Minimum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * arminumum_stock;
+    let seasonal_Maximum = (oneWeekStock + (inSeasonRatio * oneWeekStock)) * armaximum_stock;
 
-    let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.minumum_stock;
-    let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * autoRangeData.maximum_stock;
+    let seasonal_Minimum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * arminumum_stock;
+    let seasonal_Maximum_Out = (oneWeekStock - (outSeasonRatio * oneWeekStock)) * armaximum_stock;
 
     // Do min max calcs
-    let min = autoRangeData.use_seasonal_index ? seasonal_Minimum_Out : minimum_Stock;
-    let max = autoRangeData.use_seasonal_index ? seasonal_Minimum : maximum_Stock;
+    let min = aruse_seasonal_index ? seasonal_Minimum_Out : minimum_Stock;
+    let max = aruse_seasonal_index ? seasonal_Minimum : maximum_Stock;
 
     let isNewItem = product.active_Shop_Code_ID == '1';
 
@@ -1779,7 +1843,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
     let _minMaxIn = calculateConstraints(Math.round(seasonal_Minimum), Math.round(seasonal_Maximum), autoRangeData, average_price, isNewItem);
     let _minMaxOut = calculateConstraints(Math.round(seasonal_Minimum_Out), Math.round(seasonal_Maximum_Out), autoRangeData, average_price, isNewItem);
 
-    let surplusRequired = oneWeekStock * parseFloat(autoRangeData.surplus_stock);
+    let surplusRequired = oneWeekStock * parseFloat(arsurplus_stock);
     let surplus_Stock = new_Stock_Units - surplusRequired;
 
     let casePackFix = (product.case_Pack_Qty == undefined || product.case_Pack_Qty == null || parseFloat(product.case_Pack_Qty) < 1) ? 1 : parseFloat(product.case_Pack_Qty);
@@ -1827,7 +1891,7 @@ function getTotalProductSales(allProducts, sales, storeSales, stores, clusters, 
       (sales_potential = salesToUse / weighted_distribution * 100).toFixed(0);
 
     if (weighted_distribution != 0 && sales_units != 0)
-      (volume_potential = sales_units / weighted_distribution * 100).toFixed(0);
+      (volume_potential = volumeToUse / weighted_distribution * 100).toFixed(0);
 
     if (weighted_distribution != 0 && sales_units != 0)
       (profit_potential = sales_profit / weighted_distribution * 100).toFixed(0);
@@ -1916,38 +1980,40 @@ function calculateConstraints(min, max, autoRangeData, average_price, isNewItem)
     maxUpdated: false,
   }
 
-  // DEFAULT MINIMUM UNITS
-  if (min <= autoRangeData.default_minimum) {
-    retval.minUpdated = retval.min < autoRangeData.default_minimum ? true : false;
-    retval.min = retval.min < autoRangeData.default_minimum ? autoRangeData.default_minimum : retval.min;
+  if (autoRangeData != undefined && autoRangeData != null) {
+    // DEFAULT MINIMUM UNITS
+    if (min <= autoRangeData.default_minimum) {
+      retval.minUpdated = retval.min < autoRangeData.default_minimum ? true : false;
+      retval.min = retval.min < autoRangeData.default_minimum ? autoRangeData.default_minimum : retval.min;
 
-    retval.maxUpdated = retval.max != autoRangeData.default_minimum_max ? true : false;
-    retval.max = retval.max != autoRangeData.default_minimum_max ? autoRangeData.default_minimum_max : retval.max;
+      retval.maxUpdated = retval.max != autoRangeData.default_minimum_max ? true : false;
+      retval.max = retval.max != autoRangeData.default_minimum_max ? autoRangeData.default_minimum_max : retval.max;
 
-    if (average_price < autoRangeData.default_price_minimum) {
-      retval.minUpdated = retval.min >= autoRangeData.default_price_minimum_min ? false : true;
-      retval.maxUpdated = retval.max >= autoRangeData.default_price_minimum_max ? false : true;
-      retval.min = retval.min > autoRangeData.default_price_minimum_min ? retval.min : autoRangeData.default_price_minimum_min;
-      retval.max = retval.max > autoRangeData.default_price_minimum_max ? retval.max : autoRangeData.default_price_minimum_max;
-    }
-  } else {
-    // DEFAULT MINIMUM UNITS GREATER
-    if (min >= autoRangeData.default_minimum_greater && min <= autoRangeData.default_minimum_greater_max) {
-      retval.maxUpdated = retval.max > autoRangeData.default_minimum_greater_max ? false : true;
-      retval.max = retval.max > autoRangeData.default_minimum_greater_max ? retval.max : autoRangeData.default_minimum_greater_max;
-    } else {
-      // DEFAULT NEW ITEM
-
-      if (isNewItem && min <= autoRangeData.default_new_item_max) {
-        retval.maxUpdated = true;
-      }
-
-      // DEFAULT PRICE MINIMUM
       if (average_price < autoRangeData.default_price_minimum) {
         retval.minUpdated = retval.min >= autoRangeData.default_price_minimum_min ? false : true;
         retval.maxUpdated = retval.max >= autoRangeData.default_price_minimum_max ? false : true;
         retval.min = retval.min > autoRangeData.default_price_minimum_min ? retval.min : autoRangeData.default_price_minimum_min;
         retval.max = retval.max > autoRangeData.default_price_minimum_max ? retval.max : autoRangeData.default_price_minimum_max;
+      }
+    } else {
+      // DEFAULT MINIMUM UNITS GREATER
+      if (min >= autoRangeData.default_minimum_greater && min <= autoRangeData.default_minimum_greater_max) {
+        retval.maxUpdated = retval.max > autoRangeData.default_minimum_greater_max ? false : true;
+        retval.max = retval.max > autoRangeData.default_minimum_greater_max ? retval.max : autoRangeData.default_minimum_greater_max;
+      } else {
+        // DEFAULT NEW ITEM
+
+        if (isNewItem && min <= autoRangeData.default_new_item_max) {
+          retval.maxUpdated = true;
+        }
+
+        // DEFAULT PRICE MINIMUM
+        if (average_price < autoRangeData.default_price_minimum) {
+          retval.minUpdated = retval.min >= autoRangeData.default_price_minimum_min ? false : true;
+          retval.maxUpdated = retval.max >= autoRangeData.default_price_minimum_max ? false : true;
+          retval.min = retval.min > autoRangeData.default_price_minimum_min ? retval.min : autoRangeData.default_price_minimum_min;
+          retval.max = retval.max > autoRangeData.default_price_minimum_max ? retval.max : autoRangeData.default_price_minimum_max;
+        }
       }
     }
   }

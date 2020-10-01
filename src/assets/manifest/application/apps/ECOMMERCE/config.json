@@ -1,0 +1,13 @@
+
+{
+    "configName":"Ecommerce",
+    "report":false,
+    "routes": [
+        {
+            "route": "/Ecommerce",
+            "routeName": "Ecommerce",
+            "title": "Ecommerce",
+            "openInNewWindow": false
+        }
+    ]
+}

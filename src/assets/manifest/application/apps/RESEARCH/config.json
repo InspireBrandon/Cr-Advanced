@@ -1,0 +1,13 @@
+
+{
+    "configName":"Research",
+    "report":false,
+    "routes": [
+        {
+            "route": "/Research",
+            "routeName": "Research",
+            "title": "Research",
+            "openInNewWindow": false
+        }
+    ]
+}

@@ -97,8 +97,11 @@ class DrawingHelper {
                 let fpI = new FloorPlanItem(child, fixture);
                 self.draw(fpI, shadowGenerator, allItems) 
             });
+
+            return fixture;
         } else {
             console.warn(`[DRAWING-HELPER] Failed to draw fixture. Type of ${drop.type} is not defined.`);
+            return null;
         }
     }
 }

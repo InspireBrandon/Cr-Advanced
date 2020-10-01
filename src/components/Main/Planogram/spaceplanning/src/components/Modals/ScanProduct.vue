@@ -1,7 +1,7 @@
 <template>
     <div>
         <v-layout row justify-center>
-            <v-dialog v-model="dialog" persistent max-width="400">
+            <v-dialog v-model="dialog" persistent max-width="500">
                 <v-card>
                     <v-toolbar flat dark dense color="primary">
                         <v-toolbar-title>Scan Barcode</v-toolbar-title>
@@ -39,6 +39,7 @@
         methods: {
             show(onAddProduct) {
                 let self = this;
+
                 self.dialog = true;
                 self.onAddProduct = onAddProduct;
                 setTimeout(() => {
@@ -55,14 +56,33 @@
             },
             scanBarcode() {
                 let self = this;
+
                 self.getProduct();
             },
             getProduct() {
                 let self = this;
 
-                Axios.get(process.env.VUE_APP_API + 'Product/ProductByBarcode?db=CR-Hinterland-Live&barcode=' + self.barcode)
+                Axios.get(process.env.VUE_APP_API + 'Product/ProductByBarcode?db=CR-Hinterland-Live&barcode=' + self
+                        .barcode)
                     .then(r => {
-                        self.onAddProduct(r.data[0])
+                        if (r.data[0] == undefined || r.data[0] == null) {
+                            self.getNplProduct();
+                        } else {
+                            self.onAddProduct(r.data[0], false)
+                            self.barcode = '';
+                        }
+                    })
+                    .catch(e => {
+                        console.log(e)
+                        alert("Failed to find a product. Please try again");
+                    })
+            },
+            getNplProduct() {
+                let self = this;
+
+                Axios.get(process.env.VUE_APP_MASTER_API + 'Product?type=1&value=' + self.barcode)
+                    .then(r => {
+                        self.onAddProduct(r.data, true)
                         self.barcode = '';
                     })
                     .catch(e => {

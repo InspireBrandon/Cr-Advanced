@@ -276,8 +276,8 @@ class DuplicationHelper {
                 scaleX: 1,
                 scaleY: 1,
                 rotation: item.rotation(),
-
-                fill: item.attrs.fill
+                fill: item.attrs.fill,
+                floorplan_Fixture_ID: item.attrs.floorplan_Fixture_ID,
             })
         }
         break;

@@ -7,17 +7,6 @@
                     <app-block :appConfigDetail="appConfigDetail"></app-block>
                 </v-flex>
             </v-layout>
-            <!-- <v-layout row wrap>
-                <v-flex lg12 md12 sm12 xs12 v-if="!hasDatabases">
-                    <v-card>
-                        <v-card-text>
-                            It appears as though you do not have access to any databases. Please request access to
-                            continue...
-                        </v-card-text>
-                    </v-card>
-                </v-flex>
-            </v-layout> -->
-            <!-- <PlanogramNoteViewer/> -->
         </v-container>
     </div>
 </template>

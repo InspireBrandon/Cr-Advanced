@@ -469,6 +469,7 @@
           minimum_units: 1,
           use_volume_adjusted: true,
           delisted_to_packinglist: false,
+          use_transactional_out_of_stock: false,
           // Product Supply
           safety_stock_highlight: 1,
           casepack_qty: 12,
@@ -899,8 +900,7 @@
         case 'sales_Units': {
           let includeStockLevels = options.stockLevels == headerOptions.yes || options.stockLevels == headerOptions.all;
 
-          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all || options
-            .stockAnalysis == headerOptions.yes || options.stockAnalysis == headerOptions.all || includeStockLevels;
+          retval = options.volumeAnalysis == headerOptions.yes || options.volumeAnalysis == headerOptions.all || includeStockLevels;
         }
         break;
         case 'volume_adjusted': {
@@ -1264,7 +1264,6 @@
         let self = this;
 
         self.rowData.forEach(el => {
-          if (self.testMode) {
             if (indicator == 'YES' && (el.autoRangeOneItem || el.autoRangeItem)) {
               self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                 self.selectedClusterType,
@@ -1285,6 +1284,7 @@
               });
 
               self.gridApi.redrawRows();
+
             } else if (indicator == 'NO' && (!el.autoRangeOneItem && !el.autoRangeItem)) {
               self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                 self.selectedClusterType,
@@ -1306,7 +1306,7 @@
 
               self.gridApi.redrawRows();
             }
-          } else {
+
             if (el.alt_Store_Range_Indicator == indicator) {
               self.rangingController[self.testMode ? 'setTestClusterIndicator' : 'setClusterIndicator'](
                 self.selectedClusterType,
@@ -1325,11 +1325,12 @@
                     indicator == "YES" ? 2 : 1);
                 }
               });
-
-              self.gridApi.redrawRows();
             }
-          }
         });
+
+        self.calculateAutoRange();
+
+        // self.gridApi.redrawRows();
       },
       showClusterHighlight() {
         let self = this;
@@ -1460,6 +1461,8 @@
                 ).toFixed(2);
               }
             });
+
+            self.calculateAutoRange();
           }
         );
       },
@@ -2681,7 +2684,7 @@
             self.columnDefs[18] = {
               headerName: "Test Indicator",
               field: "test_Range_Indicator",
-              hide: true,
+              hide: false,
               editable: true,
               cellEditor: "agRichSelectCellEditor",
               cellEditorParams: {
@@ -2932,7 +2935,7 @@
         let field = e.colDef.field;
         let isIndicator = e.colDef.isIndicator;
 
-        if (field != "store_Range_Indicator") {
+        if (field != "store_Range_Indicator" && field != "test_Range_Indicator") {
           if (isIndicator != undefined && isIndicator != null && isIndicator) {
             if (e.oldValue != e.newValue) {
               let store = e.data[field + "ID"];
@@ -3963,8 +3966,6 @@
 
   function RangeReports(rangingData, endingStock) {
     let self = this;
-
-    console.log("endingStock", endingStock);
 
     self.current = new RangeReport(rangingData, "current", endingStock);
     self.potential = new RangeReport(rangingData, "potential", endingStock);

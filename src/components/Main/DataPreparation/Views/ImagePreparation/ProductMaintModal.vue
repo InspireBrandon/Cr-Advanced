@@ -482,7 +482,8 @@
                                     label="Nesting Height"></v-text-field>
                                 </v-flex>
                                 <v-flex md12>
-                                  <v-select :items="nesting_Types" v-model="form.nesting_Type" type="number" dense hide-details label="Nesting Type"></v-select>
+                                  <v-select :items="nesting_Types" v-model="form.nesting_Type" type="number" dense
+                                    hide-details label="Nesting Type"></v-select>
                                 </v-flex>
                               </v-layout>
                             </v-card-text>
@@ -573,12 +574,10 @@
                 newObj.object.Data[prop] = self.form[prop];
               }
 
-              console.log(newObj.object)
-
               newObj.object.Data.id = newObj.object.Data.productID;
 
-              Axios.put(process.env.VUE_APP_API + "Product?db=CR-Hinterland-Live", newObj.object.Data)
-                .then(r => {
+              self.updateProduct(newObj, () => {
+                self.updateMasterProductDimensions(newObj, () => {
                   newObj.object.Data.useAlternateBarcode = self.bcDropdown != -1;
 
                   let bc = "";
@@ -597,13 +596,12 @@
                   newObj.object.Data.alternatePackingType = self.product_type;
 
                   let event = new CustomEmitter();
-                  event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj, self
+                  event.modal_saved(EventBus, self.planoData.type, self.planoData.subType, newObj,
+                    self
                     .planoData.id, self.planoData.object);
                   self.hide();
                 })
-                .catch(e => {
-
-                })
+              })
             }
           })
         }
@@ -784,7 +782,7 @@
               }
             }
 
-            if(self.form.nesting_Type == undefined || self.form.nesting_Type == null) {
+            if (self.form.nesting_Type == undefined || self.form.nesting_Type == null) {
               self.form.nesting_Type = "Inward"
             }
 
@@ -928,7 +926,8 @@
             pallet_Width: self.form.pallet_Width,
             pallet_Depth: self.form.pallet_Depth,
             nesting_Height: self.form.nesting_Height,
-            nesting_Type: self.form.nesting_Type == undefined || self.form.nesting_Type == null ? 'Inward' : self.form.nesting_Type,
+            nesting_Type: self.form.nesting_Type == undefined || self.form.nesting_Type == null ? 'Inward' : self.form
+              .nesting_Type,
           }
 
           self.afterClose(request);
@@ -1290,8 +1289,6 @@
           }
         });
 
-        console.log(productData.ProductData)
-
         calcData.DaysOfSupply = self.CalculationHandler.Calculate_Days_Of_Supply_Potential(
           productData.TotalFacings,
           self.$store.state.usePotential ? productData.ProductData.volume_Potential : productData.ProductData
@@ -1502,6 +1499,40 @@
           }
         })
       },
+      updateProduct(newObj, callback) {
+        let self = this;
+        let pd = newObj.object.Data;
+
+        if (pd.isNplProduct) {
+          callback();
+        } else {
+          Axios.put(process.env.VUE_APP_API + 'Product?db=CR-Hinterland-Live', newObj.object.Data)
+            .then(r => {
+              callback();
+            })
+        }
+      },
+      updateMasterProductDimensions(newObj, callback) {
+        let self = this;
+
+        let pd = newObj.object.Data;
+
+        if (pd.isNplProduct) {
+          let request = {
+            productUID: pd.uid,
+            height: parseFloat(pd.height),
+            width: parseFloat(pd.width),
+            depth: parseFloat(pd.depth),
+          }
+
+          Axios.put(process.env.VUE_APP_MASTER_API + 'Product/UpdateDimensions', request)
+            .then(r => {
+              callback();
+            })
+        } else {
+          callback();
+        }
+      }
     },
     components: {
       Prompt,

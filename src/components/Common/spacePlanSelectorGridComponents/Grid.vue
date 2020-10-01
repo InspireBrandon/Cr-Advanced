@@ -13,6 +13,7 @@
 <script>
     import completeCheckbox from '@/components/Common/spacePlanSelectorGridComponents/completeCheckBox'
     import distribute from '@/components/Common/spacePlanSelectorGridComponents/Distribute'
+    import FloorPlan from '@/components/Common/spacePlanSelectorGridComponents/FloorPlan.vue'
 
     import {
         AgGridVue
@@ -21,9 +22,10 @@
         components: {
             completeCheckbox,
             AgGridVue,
-            distribute
+            distribute,
+            FloorPlan
         },
-        props: ["headers", "rowData", "setCanDistribute", "setComplete", "selectedSpacePlan", "setSelectedPlano"],
+        props: ["headers", "rowData", "setCanDistribute", "setComplete", "setFloorPlan", "selectedSpacePlan", "setSelectedPlano"],
         data() {
             return {
                 defaultColDef: {
@@ -62,7 +64,6 @@
                 var rows = e.api.getSelectedNodes()
                 let newslct = rows[0].data
                 self.setSelectedPlano(newslct)
-                console.log("onSelectionChanged", self.selectedSpacePlan);
             },
         }
     }

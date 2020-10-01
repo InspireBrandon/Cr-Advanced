@@ -104,7 +104,7 @@
                 </template>
                 <span>View 3D</span>
             </v-tooltip>
-            <v-btn @click="logMutli"> log</v-btn>
+            <v-btn @click="buildRuns">Build Runs</v-btn>
             <div v-show="multiSelectGroup !=null">
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
@@ -237,7 +237,7 @@
                                     label="rotation" v-model="properties.rotation" hide-details>
                                 </v-text-field>
                                 <v-checkbox @change="applyProperties" v-model="keepAspectRatio"
-                                    v-if="selectedItem.attrs.name=='image'" label="Keep aspect ratio">
+                                    v-if="selectedItem.attrs.name=='Image'" label="Keep aspect ratio">
                                 </v-checkbox>
 
                                 <v-text-field type="color" label="Color" v-model="properties.fill"
@@ -263,7 +263,7 @@
                                 <v-text-field type="color" label="Color" v-model="brush.color" hide-details>
                                 </v-text-field>
                             </v-card-text>
-                            <v-toolbar dark dense flat color="grey darken-3">
+                            <!-- <v-toolbar dark dense flat color="grey darken-3">
                                 <v-toolbar-title>
                                     <div>Layers</div>
                                     <div v-if="selectedLayer!=null">
@@ -283,16 +283,16 @@
                                         </v-list-tile>
                                     </v-list>
                                 </v-menu>
-                            </v-toolbar>
+                            </v-toolbar> -->
                             <v-card-text class="pa-0 pt-0" style="height: 47%; overflow-y: scroll;">
-                                <!-- <div @dragover.prevent draggable="true" @drop="MoveLayerTopTop($event)">
+                                <div @dragover.prevent draggable="true" @drop="MoveLayerTopTop($event)">
                                     <div class="pa-1 grey lighten-3" style="display: flex;">
                                         <div>
                                             Drag layer here to move to top.
                                         </div>
                                     </div>
                                     <v-divider></v-divider>
-                                </div> -->
+                                </div>
                                 <RecursiveLayer v-if="layerTree.length>0" ref="RecursiveLayer"
                                     :selectItemFromSidePanel="selectItemFromSidePanel" :setItemVisible="setItemVisible"
                                     :selectedLayerTreeItem="selectedLayerTreeItem" :editLayerName="editLayerName"
@@ -314,7 +314,7 @@
             <Prompt ref="Prompt" />
             <Spinner ref="spinner"></Spinner>
             <FloorConfigModal ref="FloorConfigModal" />
-            <FloorPlanMediaModal ref="FloorPlanMediaModal" />
+            <!-- <FloorPlanMediaModal ref="FloorPlanMediaModal" /> -->
             <Settings ref="settings" />
 
         </v-container>
@@ -350,7 +350,7 @@
     import GroupingHandler from './libs/drawing/Functions/Grouping-handler'
     import GroupDuplicationHelper from './libs/drawing/Functions/Group-Duplication-Helper'
 
-
+    import RunBuilder from './libs/helpers/runbuilder.js'
 
     import SnappingHandler from './libs/drawing/Functions/snapping-handler'
 
@@ -359,7 +359,7 @@
     import Spinner from '@/components/Common/Spinner';
 
 
-    import FloorPlanMediaModal from "./FloorPlanMediaModal"
+    // import FloorPlanMediaModal from "./FloorPlanMediaModal"
     import Settings from './Settings'
     import RecursiveLayer from "./RecursiveLayer.vue"
     import PlanogramLibrary from "./PlanogramLibrary.vue"
@@ -395,7 +395,7 @@
             floorPlanSelector,
             Prompt,
             Spinner,
-            FloorPlanMediaModal,
+            // FloorPlanMediaModal,
             threeD
         },
         // 1 block = 1 meter
@@ -593,6 +593,46 @@
             }
         },
         methods: {
+            buildRuns() {
+                let self = this;
+
+                let runs = window.prompt("How many runs?");
+                let doubleSided = window.prompt("double sided? (y, n)");
+                let useEnds = window.prompt("Use ends? (y, n)");
+
+                let runParams = {
+                    runs: parseInt(runs),
+                    doubleSided: doubleSided == 'y',
+                    useEnds: useEnds == 'y'
+                }
+
+                let runBuilder = new RunBuilder();
+                let runsToBuild = runBuilder.buildRun(self.selectedItem, runParams);
+
+                let newGroup = new Konva.Group({
+                    draggable: true
+                })
+
+                newGroup.add(self.selectedItem);
+
+                runsToBuild.forEach(e => {
+                    var rect = new Konva.Rect({
+                        x: e.x,
+                        y: e.y,
+                        width: e.w,
+                        height: e.h,
+                        stroke: 'black',
+                        strokeWidth: 0.5,
+                        rotation: e.r
+                    })
+
+                    newGroup.add(rect);
+                });
+
+                self.fixtureLayer.add(newGroup);
+                self.fixtureLayer.draw();
+                self.stage.draw();
+            },
             openSettings() {
                 let self = this
                 let settings = {
@@ -611,7 +651,6 @@
                         e.draggable(item.locked)
                         e.attrs.locked = item.locked
                         self.stage.batchDraw()
-                        console.log("toggleItem", e.attrs.draggable);
                     })
                 })
             },
@@ -640,7 +679,6 @@
             },
             logMutli() {
                 let self = this
-                console.log("layer", self.layerTree)
             },
             addItemToGroup() {
                 let self = this
@@ -740,9 +778,9 @@
             },
             openMediaManager() {
                 let self = this
-                self.$refs.FloorPlanMediaModal.open(true, media => {
+                // self.$refs.FloorPlanMediaModal.open(true, media => {
 
-                })
+                // })
             },
             openFloorSettings() {
                 let self = this
@@ -832,18 +870,12 @@
 
                 case "Gondola-Rect": {
                     let rect
-                    if (item.fixture_ID == 0) {
-                        rect = new Rect(parentArr, {
-                            x: item.x,
-                            y: item.y,
-                        }, null, null, null);
-                    } else {
-                        rect = new Rect(parentArr, {
-                            x: item.x,
-                            y: item.y,
-                        }, null, null, null, self.imageSrc(item.fixture_ID,
-                            "Top"), self.stage);
-                    }
+
+                    rect = new Rect(parentArr, {
+                        x: item.x,
+                        y: item.y,
+                    }, null, null, null);
+
                     parentLayerTree.children.push(new treeItem({
                         KonvaID: rect.shape._id,
                         visible: true,
@@ -855,6 +887,7 @@
                         children: [],
                         parent: parentLayerTree
                     }))
+
                     rect.shape.setAttrs({
                         DropID: item.fixture_ID,
                         fill: item.color,
@@ -862,7 +895,9 @@
                         depth: item.depth,
                         height: item.height,
                         rotation: item.rotation,
-                        draggable: true
+                        draggable: true,
+                        floorplan_Fixture_ID: item.floorplan_Fixture_ID,
+                        fixture_ID: item.fixture_ID
                     })
                 }
                 break;
@@ -882,21 +917,23 @@
                         draggable: false,
                         name: "Image",
                         children: [],
-                        parent: parentLayerTree
+                        parent: parentLayerTree,
+                        locked: false
                     }))
                     image.shape.setAttrs({
                         width: item.width,
                         depth: item.depth,
-                        height: item.height
+                        height: item.height,
+                        locked: false
                     })
                     image.shape.attrs.imageID = item.imageID
                     var imageObj = new Image();
 
                     imageObj.onload = function () {
                         image.shape.image(imageObj);
-                        self.stage.batchDraw();
                         // self.selectedTool = ''
-                        image.shape.draggable(true)
+                        image.shape.draggable(false)
+                        self.stage.batchDraw();
                     }
                     imageObj.src = self.imageFloorplanFixtureSrc(item.imageID);
                 }
@@ -1133,6 +1170,7 @@
                                     child.destroyChildren()
                                 }
                             })
+
                             self.drawSavedItems(r.data, self.stage, self.layerTree,
                                 cb => {
                                     self.stage.batchDraw()
@@ -1192,7 +1230,9 @@
                             Fixture_ID: item.saveID,
                             color: item.attrs.fill,
                             imageID: item.attrs.imageID,
-                            children: []
+                            children: [],
+                            floorplan_Fixture_ID: item.attrs.floorplan_Fixture_ID,
+                            fixture_ID: item.attrs.fixture_ID
                         }
                         if (item.attrs.name == "arrow") {
                             reqObj.x = item.attrs.points[0]
@@ -1201,7 +1241,7 @@
                             reqObj.arrowEndY = item.attrs.points[3]
 
                         }
-                        if (item.attrs.name == "image") {
+                        if (item.attrs.name == "Image") {
                             self.imageIDArr.push(item)
                         }
                         parentArr.push(reqObj)
@@ -1577,6 +1617,8 @@
                     y: dropPos.y
                 }, null, null);
 
+                console.log('libraryItem', libraryItem)
+
                 self.fixtureTree.children.push(new treeItem({
                     KonvaID: rect.shape._id,
                     visible: true,
@@ -1596,7 +1638,8 @@
                     height: height,
                     width: width,
                     depth: depth,
-                    type: "fixture"
+                    type: "fixture",
+                    fixture_ID: libraryItem.data.id
                 })
                 self.selectLayer(self.fixtureTree, self.layers, layerCB => {
 
@@ -1614,38 +1657,140 @@
                             callback(r.data)
                         })
             },
+            getHeader(systemFileID, callback) {
+                let self = this
+
+                axios.defaults.headers.common["TenantID"] = sessionStorage.currentDatabase;
+
+                axios.post(process.env.VUE_APP_API + `FloorPlanheader/Exisitng?Planogram_ID=${systemFileID}`)
+                    .then(
+                        r => {
+                            callback(r.data)
+                        })
+            },
+            getFixtures(fixtureHeaderID, callback) {
+                let self = this;
+
+                Axios.get(
+                        process.env.VUE_APP_API +
+                        `FloorPlan_Fixtures/GetFixtureByHeaderID?fixtureHeaderID=${fixtureHeaderID}`
+                    )
+                    .then(r => {
+                        callback(r.data);
+                    })
+                    .catch(e => {
+                        console.log(e);
+                    });
+            },
+            getFloorPlanItems(headerID, callback) {
+                let self = this;
+
+                axios.get(process.env.VUE_APP_API + `FloorplanItems/Exisitng?headerID=${headerID}`)
+                    .then(r => {
+                        callback(r.data);
+                    })
+                    .catch(e => {
+
+                    })
+            },
             dropDragItem(ev) {
                 ev.preventDefault();
                 let self = this
-                let librarydata = window.library
-                if (window.library != null) {
+                let librarydata = window.library;
 
+                console.log(librarydata.type)
 
-                    if (window.library.type == "CUSTOM_PLANOGRAM" || window.library.type == "CUSTOM") {
-                        self.checkForHeader(window.library.data, HeaderCallback => {
-
-                            if (HeaderCallback != null) {
-                                self.drawSaved(HeaderCallback, ev)
-                            } else {
-
-                                self.getPlanogramData(librarydata, defaultData => {
-                                    if (defaultData != null && defaultData != undefined) {
-                                        self.drawDefaultSpace(defaultData, ev)
-                                    } else {
-                                        alert("No fixture setup found for spaceplan")
-                                    }
-                                })
-                            }
-                        })
-                    } else {
-                        self.drawLibraryFixture(ev, window.library, cb => {
-                            window.libraryDrag = null
-                            window.library = null
-                        })
-                    }
+                if (librarydata.type == "OBSTRUCTION" || librarydata.type == "GONDOLA" || librarydata.type == 'BASE') {
+                    self.drawLibraryFixture(ev, window.library, cb => {
+                        window.libraryDrag = null
+                        window.library = null
+                    })
                 } else {
-                    self.drawSaved(window.libraryDrag)
+                    self.stage._setPointerPosition(ev);
+                    let dropPos = self.GetTransformedMousePoint(self.stage);
+
+                    self.getHeader(librarydata.data.id, data => {
+                        self.getFloorPlanItems(data.id, items => {
+                            let children = items[0].children;
+
+                            let group = new Konva.Group({
+                                x: dropPos.x,
+                                y: dropPos.y,
+                                name: 'group',
+                                visible: true,
+                                showEditName: false,
+                                selected: false,
+                                showChildren: false,
+                                draggable: true,
+                                locked: false,
+                                drawType: "group",
+                                type: "group",
+                            })
+
+                            let layertreeitem = new treeItem({
+                                KonvaID: group._id,
+                                children: [],
+                                name: "group",
+                                showEditName: false,
+                                visible: true,
+                                selected: true,
+                                showChildren: true,
+                                drawType: "group",
+                                locked: false,
+                                parent: self.fixtureTree
+                            })
+
+                            self.fixtureLayer.add(group)
+                            self.fixtureTree.children.push(layertreeitem)
+
+                            children.forEach(child => {
+                                let attrs = JSON.parse(child.attributes);
+
+                                let item = {
+                                    name: 'Gondola-Rect',
+                                    x: attrs.x / 3,
+                                    y: attrs.y / 3,
+                                    width: attrs.width / 3,
+                                    height: attrs.height / 3,
+                                    stroke: 'black',
+                                    strokeWidth: 0.5,
+                                    rotation: attrs.rotation,
+                                    floorplan_Fixture_ID: child.floorplan_Fixture_ID,
+                                    fixture_ID: child.fixture_ID
+                                }
+
+                                self.DrawFixture(item, group, layertreeitem, cb => {
+                                    // self.stage.batchDraw()
+                                })
+                            })
+
+                            self.fixtureLayer.add(newGroup);
+                            self.fixtureLayer.draw();
+                        })
+                    })
                 }
+
+                // if (window.library != null) {
+                //     if (window.library.type == "CUSTOM_PLANOGRAM" || window.library.type == "CUSTOM") {
+                //         self.checkForHeader(window.library.data, HeaderCallback => {
+
+                //             self.getPlanogramData(librarydata, defaultData => {
+                //                 if (defaultData != null && defaultData != undefined) {
+                //                     self.drawDefaultSpace(defaultData, ev)
+                //                 } else {
+                //                     alert("No fixture setup found for spaceplan")
+                //                 }
+                //             })
+                //         })
+                //     } else {
+                //         self.drawLibraryFixture(ev, window.library, cb => {
+                //             window.libraryDrag = null
+                //             window.library = null
+                //         })
+                //     }
+                // } else {
+                //     self.drawSaved(window.libraryDrag)
+                // }
             },
             getPlanogramData(data, callback) {
                 let self = this
@@ -1862,7 +2007,7 @@
 
 
                 self.selectedItem.attrs["fill"] = self.properties["fill"]
-                if (self.selectedItem.attrs.name == "image") {
+                if (self.selectedItem.attrs.name == "Image") {
                     self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
                     if (self.selectedItem.attrs.keepAspectRatio == true) {
                         if (field == "height") {
@@ -1942,9 +2087,7 @@
             },
             selectItemFromSidePanel(item) {
                 let self = this
-                console.log("selectItemFromSidePanel", item);
                 if (item.name == "Image" && item.locked == false) {
-                    console.log("return");
 
                     return
                 }
@@ -1953,10 +2096,7 @@
                         return
                     }
                     clickTapHelper.destroyTransformer(self.stage, cb => {
-                        self.clickselect(e, callback => {
-                            console.log("clickselect [selectItemFromSidePanel]", callback);
-
-                        })
+                        self.clickselect(e, callback => {})
                         // clickTapHelper.setSelectedItem(e, self.findLayerItem, self
                         //     .selectedLayerTreeItem, self.selectedItem, self.selectedLayer, self
                         //     .layerTree, cb => {
@@ -1984,11 +2124,11 @@
                             self.properties.radius = (self.selectedItem.attrs.radius / (self.meterRatio *
                                 self.floorConfig.blockRatio)).toFixed(2);
                             self.properties.rotation = self.selectedItem.attrs.rotation;
-                            if (self.selectedItem.attrs.name == "image") {
+                            if (self.selectedItem.attrs.name == "Image") {
                                 self.selectedItem.attrs.keepAspectRatio = self.keepAspectRatio
                             }
                             var tr
-                            if (self.selectedItem.attrs.name == "image") {
+                            if (self.selectedItem.attrs.name == "Image") {
                                 if (self.selectedItem.attrs.keepAspectRatio != true) {
                                     tr = new Konva.Transformer({
                                         enabledAnchors: ["top-left", "top-center", "top-right",
@@ -2012,7 +2152,7 @@
 
                             if (self.selectedItem.attrs.name == "Gondola-Rect" || self.selectedItem.attrs
                                 .name ==
-                                "image" || self.selectedItem.attrs.name == "Label") {
+                                "Image" || self.selectedItem.attrs.name == "Label") {
                                 tr.rotateEnabled(true);
 
                             } else {
@@ -2528,7 +2668,7 @@
                     self.stage.batchDraw()
                     return
                 }
-                if (self.selectedItem.attrs.name != 'image') {
+                if (self.selectedItem.attrs.name != 'Image') {
                     return
                 }
                 let rotation = self.dotted.shape.attrs.rotation
@@ -2651,13 +2791,11 @@
             clickselect(item, callback) {
                 let self = this
                 self.showRotation = true;
-                console.log("clickselect [LOCKED] ", item.attrs.locked);
 
                 if (item.attrs.name == "Image" && item.attrs.locked == false) {
-                    console.log("inside locked");
-
                     callback(item)
                 }
+
                 switch (item.parent.attrs.name) {
                     case "Building": {
                         self.selectLayer(self.buildingLayerTree, self.layerTree, layerCB => {
@@ -2731,6 +2869,8 @@
 
                 break;
                 case "group": {
+                    console.log("group", item)
+
                     if (item.parent.attrs.rotation == 0)
                         self.showRotation = false;
                     self.clickSelectFindCurrentParent(item, cbitem => {
@@ -2747,8 +2887,7 @@
                 }
                 break;
                 case "image": {
-                    console.log("clickselect [IMAGE]");
-
+                    console.log(item);
                     self.selectLayer(self.backgroundTree, self.layerTree, layerCB => {
                         callback(item)
                     })

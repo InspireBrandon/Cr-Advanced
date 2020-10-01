@@ -314,6 +314,6 @@
 
 <style scoped>
     #chartdiv {
-        height: 300px;
+        height: 380px;
     }
 </style>

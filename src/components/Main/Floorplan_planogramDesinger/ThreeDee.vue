@@ -101,9 +101,6 @@ export default {
       self.createLight(scene);
       self.createFloor(scene, designerDrops, groupData);
       self.createFixtures(scene, drops);
-      // self.createSkybox(scene);
-      // self.createCans(scene, 0.92);
-      // self.createCans(scene, 1.06);
       return scene;
     },
     createCamera(scene, canvas, groupData) {
@@ -124,19 +121,8 @@ export default {
       camera.checkCollisions = true;
       camera.speed = 0.1;
 
-      // camera.rotation.y = degreesToRadians(190);
-
-      console.log("camera", camera);
-
       camera.inputs.remove(camera.inputs.attached.keyboard);
       self.addDocumentListeners();
-
-      //   camera.inputs.remove(camera.inputs.attached.keyboard);
-      //   self.addDocumentListeners();
-
-      // camera.position.x = 2 / 2;
-      // camera.position.z = -4;
-      // camera.position.y = 3;
     },
     createLight(scene) {
       let self = this;
@@ -157,58 +143,9 @@ export default {
       light.intensity = 1;
 
       shadowGenerator = new BABYLON.ShadowGenerator(1024, light);
-      // shadowGenerator.usePoissonSampling = true;
     },
     createFloor(scene, designerDrops, groupData) {
       let self = this;
-
-      // let firstElement = designerDrops[0];
-
-      // let highestX = firstElement.x + firstElement.width;
-      // let highestY = firstElement.y + firstElement.height;
-      // let lowestX = firstElement.x;
-      // let lowestY = firstElement.y;
-
-      // designerDrops.forEach(dd => {
-      //   if((dd.x + dd.width) > highestX)  {
-      //     highestX = dd.x;
-      //     console.log('highestX', highestX)
-      //   }
-
-      //   if(dd.x < lowestX)
-      //     lowestX = dd.x;
-
-      //   if(dd.y + dd.height > highestY) {
-      //     highestY = dd.y;
-
-      //     if(highestY == 0) {
-      //       highestY = dd.y + dd.height;
-      //     }
-      //   }
-
-      //   if(dd.y > lowestY)
-      //     lowestY = dd.y;
-      // });
-
-      // highestX = highestX / 100;
-      // highestY = highestY / 100;
-
-      // if(highestX < 0)
-      //   highestX = highestX * -1;
-
-      // if(highestY < 0)
-      //   highestY = highestX * -1;
-
-      // if(lowestX < 0)
-      //   lowestX = lowestX * -1;
-
-      // if(lowestY < 0)
-      //   lowestY = lowestY * -1;
-
-      // let width = highestX - lowestX;
-      // let height = highestY - lowestY;
-
-      // console.log("dims", width, height)
 
       let height = (groupData.height + 100) / 100;
       let width = (groupData.width + 100) / 100;
@@ -304,6 +241,7 @@ export default {
       });
 
       gondolas.forEach(drop => {
+        console.log('Drop', drop)
         self.getPlanogramItem(drop.id, positionData => {
           let fpI = new FloorPlanItem(drop, null);
 
@@ -313,7 +251,6 @@ export default {
             fpI.y = attributes.y;
             fpI.rotation = attributes.rotation;
           } else {
-            // fpI.x = 0;
             fpI.y = -1;
           }
 
@@ -323,48 +260,6 @@ export default {
 
       let pointX = (furthestX - closestX) / 100;
       let pointY = (furthestY - closestY) / 100;
-      // camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
-
-      // drops.forEach(drop => {
-      //     self.getFloorPlanItem(drop.attrs.DropID, children => {
-      //         let notProducts = children.filter(child => {
-      //             return child.type != "PRODUCT";
-      //         })
-
-      //         let parent = notProducts.find(child => {
-      //             return child.id == drop.attrs.DropID;
-      //         });
-
-      //         notProducts.forEach(child => {
-      //             let fpI = new FloorPlanItem(child, parent);
-
-      //             if (fpI.x < closestX)
-      //                 closestX = fpI.x;
-
-      //             if ((fpI.x + fpI.width) > furthestX)
-      //                 furthestX = +fpI.width;
-
-      //             if (fpI.y < closestY)
-      //                 closestY = fpI.y;
-
-      //             if ((fpI.y + fpI.height) > furthestY)
-      //                 furthestY = +fpI.height;
-
-      //             // self.getFixture(child.spaceplan_Fixture_ID, () => {
-
-      //             // })
-
-      //             self.drawingHelper.draw(fpI);
-      //         })
-
-      //         let pointX = ((furthestX) - (closestX));
-      //         let pointY = ((furthestY) - (closestY));
-
-      //         console.log("pointyPoints", pointX, pointY)
-
-      //         camera.setTarget(new BABYLON.Vector3(pointX, 0, pointY));
-      //     })
-      // });
     },
     getFloorPlanItem(dropID, callback) {
       let self = this;
@@ -377,7 +272,6 @@ export default {
           callback(r.data);
         })
         .catch(e => {
-          console.log(e);
           alert("Failed to get floorplan fixture data");
         });
     },
@@ -400,11 +294,9 @@ export default {
           `FloorPlan_Fixtures/GetFixtureByHeaderID?fixtureHeaderID=${fixtureHeaderID}`
       )
         .then(r => {
-          console.log("get fixtures", r.data);
           callback(r.data);
         })
         .catch(e => {
-          console.log(e);
         });
     },
     addDocumentListeners() {
@@ -428,15 +320,16 @@ export default {
         process.env.VUE_APP_API +
           `FloorplanPlanogramItem?floorplanFixtureId=${fixtureID}`
       ).then(r => {
-        console.log(r.data);
         callback(r.data);
       });
     },
     close() {
       let self = this;
+
       document.removeEventListener("keydown", e => {
         manageCamera(e.code);
       });
+
       sceneObj.dispose();
       self.showCanvas = false;
       self.dialog = false;
