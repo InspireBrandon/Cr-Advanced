@@ -30,7 +30,7 @@
     "babel-polyfill": "^6.26.0",
     "cloudinary-core": "^2.6.2",
     "golden-layout": "^1.5.9",
-    "jsonwebtoken": "^8.5.0",
+    "jsonwebtoken": "^9.0.0",
     "konva": "^3.2.0",
     "moment": "^2.24.0",
     "npm": "^6.9.2",
